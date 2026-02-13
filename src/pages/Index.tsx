@@ -12,6 +12,7 @@ import TailorSection from "@/components/cv-optimiser/TailorSection";
 import Footer from "@/components/Footer";
 import { callGeminiApi, type GeminiResponse, type TailorStyle } from "@/lib/gemini-api";
 import { useToast } from "@/hooks/use-toast";
+import { useDebounce } from "@/hooks/use-debounce";
 import {
   Tooltip,
   TooltipContent,
@@ -43,6 +44,7 @@ const Index = () => {
   const [cvText, setCvText] = useState("");
   const [currentFileName, setCurrentFileName] = useState<string | null>(null);
   const [jobSpecText, setJobSpecText] = useState("");
+  const debouncedJobSpecText = useDebounce(jobSpecText, 500);
   const [keywords, setKeywords] = useState("");
   const [styles, setStyles] = useState<TailorStyle[]>(["Precision"]);
   const [loading, setLoading] = useState(false);
@@ -75,6 +77,17 @@ const Index = () => {
   useEffect(() => {
     localStorage.setItem("saved-cvs", JSON.stringify(savedCVs));
   }, [savedCVs]);
+
+  useEffect(() => {
+    const saved = localStorage.getItem("saved-job-spec");
+    if (saved) {
+      setJobSpecText(saved);
+    }
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem("saved-job-spec", debouncedJobSpecText);
+  }, [debouncedJobSpecText]);
 
   useEffect(() => {
     if (saveCV && savedCVs.length > 0 && !cvText && !currentFileName) {
