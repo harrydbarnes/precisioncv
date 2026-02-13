@@ -56,7 +56,7 @@ const TailorSection = ({ keywords, setKeywords, style, setStyle }: TailorSection
       </div>
 
       <div className="space-y-3">
-        <Label className="text-sm font-semibold">Style of Updates</Label>
+        <Label className="text-sm font-semibold">Update Style</Label>
         <div className="flex flex-wrap gap-3">
           <TooltipProvider>
             {styles.map((s) => (
