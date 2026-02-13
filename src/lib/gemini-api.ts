@@ -29,6 +29,18 @@ export interface GeminiResponse {
 
 export type TailorStyle = "Precision" | "Ruthless" | "Ambitious";
 
+const isStringArray = (value: unknown): value is string[] =>
+  Array.isArray(value) && value.every((item) => typeof item === "string");
+
+const isQnaArray = (
+  value: unknown
+): value is Array<{ question: string; answer: string }> =>
+  Array.isArray(value) &&
+  value.every(
+    (item: any) =>
+      item && typeof item.question === "string" && typeof item.answer === "string"
+  );
+
 export async function callGeminiApi(
   apiKey: string,
   cvText: string,
@@ -165,11 +177,11 @@ ${selectedStylesInstructions}
     if (
       !parsed ||
       typeof parsed.match_percentage !== "number" ||
-      !Array.isArray(parsed.missing_skills) ||
-      !parsed.tailored_cv ||
-      !parsed.cover_letter ||
-      !Array.isArray(parsed.interview_qna) ||
-      !Array.isArray(parsed.industry_updates)
+      !isStringArray(parsed.missing_skills) ||
+      typeof parsed.tailored_cv !== "string" ||
+      typeof parsed.cover_letter !== "string" ||
+      !isQnaArray(parsed.interview_qna) ||
+      !isStringArray(parsed.industry_updates)
     ) {
       throw new Error(
         "The API response is missing required fields or has an invalid structure."
