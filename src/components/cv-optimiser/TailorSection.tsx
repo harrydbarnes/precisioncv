@@ -9,8 +9,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-
-export type TailorStyle = "Precision" | "Ruthless" | "Ambitious";
+import { TailorStyle } from "@/lib/gemini-api";
 
 interface TailorSectionProps {
   keywords: string;

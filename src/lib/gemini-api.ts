@@ -21,12 +21,14 @@ export interface GeminiResponse {
   industry_updates: string[];
 }
 
+export type TailorStyle = "Precision" | "Ruthless" | "Ambitious";
+
 export async function callGeminiApi(
   apiKey: string,
   cvText: string,
   jobSpecText: string,
   keywords: string = "",
-  style: string = "Precision"
+  style: TailorStyle = "Precision"
 ): Promise<GeminiResponse> {
   if (!apiKey.trim()) {
     throw new Error("Please enter your Gemini API key.");
@@ -38,7 +40,7 @@ export async function callGeminiApi(
     throw new Error("No job specification provided. Please add the job spec before generating.");
   }
 
-  const styleInstructions: Record<string, string> = {
+  const styleInstructions: Record<TailorStyle, string> = {
     Precision: "Optimise the CV to precisely match the job specification keywords and required experience.",
     Ruthless: "Cut down on irrelevant details and keep the CV concise and impactful.",
     Ambitious: "Push the boundaries of the candidate's experience to highlight potential and transferrable skills.",
