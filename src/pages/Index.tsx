@@ -85,36 +85,44 @@ const Index = () => {
     }
   }, []);
 
-  const handleCvExtracted = (text: string, fileName: string) => {
-    setCvText(text);
-    setCurrentFileName(fileName || null);
+  // Memoized handlers to prevent child components (like FileUpload) from re-rendering
+  // when unrelated state changes (e.g. typing in job spec)
+  const handleCvExtracted = useCallback(
+    (text: string, fileName: string) => {
+      setCvText(text);
+      setCurrentFileName(fileName || null);
 
-    if (text && fileName && saveCV) {
-      setSavedCVs((prev) => {
-        const existingIndex = prev.findIndex((c) => c.name === fileName);
-        const newCV = { name: fileName, content: text, date: Date.now() };
-        if (existingIndex >= 0) {
-          const newArr = [...prev];
-          newArr[existingIndex] = newCV;
-          return newArr;
-        }
-        return [...prev, newCV];
-      });
-    }
-  };
+      if (text && fileName && saveCV) {
+        setSavedCVs((prev) => {
+          const existingIndex = prev.findIndex((c) => c.name === fileName);
+          const newCV = { name: fileName, content: text, date: Date.now() };
+          if (existingIndex >= 0) {
+            const newArr = [...prev];
+            newArr[existingIndex] = newCV;
+            return newArr;
+          }
+          return [...prev, newCV];
+        });
+      }
+    },
+    [saveCV]
+  );
 
-  const handleSelectCV = (cv: SavedCV) => {
+  const handleSelectCV = useCallback((cv: SavedCV) => {
     setCvText(cv.content);
     setCurrentFileName(cv.name);
-  };
+  }, []);
 
-  const handleDeleteCV = (name: string) => {
-    setSavedCVs((prev) => prev.filter((c) => c.name !== name));
-    if (currentFileName === name) {
-      setCvText("");
-      setCurrentFileName(null);
-    }
-  };
+  const handleDeleteCV = useCallback(
+    (name: string) => {
+      setSavedCVs((prev) => prev.filter((c) => c.name !== name));
+      if (currentFileName === name) {
+        setCvText("");
+        setCurrentFileName(null);
+      }
+    },
+    [currentFileName]
+  );
 
   const handleError = useCallback(
     (message: string) => {

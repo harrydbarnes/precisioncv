@@ -1,3 +1,4 @@
+import { memo } from "react";
 import { motion } from "framer-motion";
 import { Info } from "lucide-react";
 import { Label } from "@/components/ui/label";
@@ -97,4 +98,5 @@ const TailorSection = ({ keywords, setKeywords, selectedStyles, setSelectedStyle
   );
 };
 
-export default TailorSection;
+// Memoized to prevent re-renders when parent state changes (e.g. typing in job spec)
+export default memo(TailorSection);
