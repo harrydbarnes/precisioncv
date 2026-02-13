@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useCallback, useState, memo } from "react";
 import { motion } from "framer-motion";
 import { Upload, FileText, X, Loader2, Trash2, ChevronDown } from "lucide-react";
 import { Label } from "@/components/ui/label";
@@ -244,4 +244,5 @@ const FileUpload = ({
   );
 };
 
-export default FileUpload;
+// Memoized to prevent re-renders when parent state changes (e.g. typing in job spec)
+export default memo(FileUpload);
