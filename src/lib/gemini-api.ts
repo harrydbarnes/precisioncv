@@ -6,15 +6,21 @@
 const GEMINI_API_URL =
   "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent";
 
-const SYSTEM_INSTRUCTION = `You are an expert career advisor and executive recruiter. You will be provided with a candidate's current CV and a target Job Specification. Your task is to analyse both inputs and output a strictly formatted JSON object. Do not include any markdown formatting outside of the JSON block.
-The JSON must contain the following four top-level keys:
-'tailored_cv': A string containing the rewritten CV. Optimise the candidate's experience and skills to closely align with the job specification, using standard professional formatting.
-'cover_letter': A string containing a professional, concise email introduction or cover letter tailored to the role.
-'interview_qna': An array of exactly 5 objects. Each object must have a 'question' key and an 'answer' key, focusing on technical and behavioural aspects relevant to the job specification.
-'industry_updates': An array of exactly 5 strings. Each string should detail a recent, relevant trend, news item, or update pertaining to the industry of the job specification to help the candidate prepare for small talk or strategic questions.
-Ensure all text uses UK English spelling`;
+const SYSTEM_INSTRUCTION = `You are an expert career advisor and executive recruiter. You will be provided with a candidate's current CV and a target Job Specification. Your task is to analyse both inputs and output a structured JSON object.
+
+Format requirements:
+'match_percentage': An integer from 0 to 100 representing how well the original CV aligns with the job specification.
+'missing_skills': An array of up to 5 key skills or requirements from the job specification that the candidate lacks.
+'tailored_cv': A string containing the rewritten CV in clean Markdown format. Optimise the candidate's experience and skills to closely align with the job specification.
+'cover_letter': A string containing a professional, concise email introduction or cover letter in Markdown format tailored to the role.
+'interview_qna': An array of exactly 5 objects (each with a 'question' and 'answer' string), focusing on technical and behavioural aspects relevant to the job.
+'industry_updates': An array of exactly 5 strings detailing recent trends or news pertaining to the industry.
+
+Ensure all text uses UK English spelling.`;
 
 export interface GeminiResponse {
+  match_percentage: number;
+  missing_skills: string[];
   tailored_cv: string;
   cover_letter: string;
   interview_qna: Array<{ question: string; answer: string }>;
@@ -82,6 +88,27 @@ ${selectedStylesInstructions}
       topP: 0.95,
       topK: 40,
       responseMimeType: "application/json",
+      responseSchema: {
+        type: "OBJECT",
+        properties: {
+          match_percentage: { type: "INTEGER" },
+          missing_skills: { type: "ARRAY", items: { type: "STRING" } },
+          tailored_cv: { type: "STRING" },
+          cover_letter: { type: "STRING" },
+          interview_qna: {
+            type: "ARRAY",
+            items: {
+              type: "OBJECT",
+              properties: {
+                question: { type: "STRING" },
+                answer: { type: "STRING" }
+              }
+            }
+          },
+          industry_updates: { type: "ARRAY", items: { type: "STRING" } }
+        },
+        required: ["match_percentage", "missing_skills", "tailored_cv", "cover_letter", "interview_qna", "industry_updates"]
+      }
     },
   };
 
@@ -132,7 +159,14 @@ ${selectedStylesInstructions}
     const parsed: GeminiResponse = JSON.parse(cleaned);
 
     // Validate the structure
-    if (!parsed.tailored_cv || !parsed.cover_letter || !parsed.interview_qna || !parsed.industry_updates) {
+    if (
+      parsed.match_percentage === undefined ||
+      !parsed.missing_skills ||
+      !parsed.tailored_cv ||
+      !parsed.cover_letter ||
+      !parsed.interview_qna ||
+      !parsed.industry_updates
+    ) {
       throw new Error("Missing required fields in the response.");
     }
 

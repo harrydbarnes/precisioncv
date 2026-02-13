@@ -22,6 +22,8 @@ describe('callGeminiApi', () => {
             parts: [
               {
                 text: JSON.stringify({
+                  match_percentage: 85,
+                  missing_skills: ['Skill 1', 'Skill 2'],
                   tailored_cv: 'Optimised CV',
                   cover_letter: 'Cover Letter',
                   interview_qna: [],

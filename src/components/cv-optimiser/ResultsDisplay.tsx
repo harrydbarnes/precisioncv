@@ -1,4 +1,4 @@
-import { FileText, Mail, MessageSquare, TrendingUp } from "lucide-react";
+import { FileText, Mail, MessageSquare, TrendingUp, Target } from "lucide-react";
 import OutputCard from "./OutputCard";
 import type { GeminiResponse } from "@/lib/gemini-api";
 
@@ -20,6 +20,31 @@ const ResultsDisplay = ({ data }: ResultsDisplayProps) => {
 
   return (
     <div className="space-y-6">
+      <div className="bg-card rounded-xl border border-border p-6 shadow-sm mb-6">
+        <div className="flex items-center gap-3 mb-4">
+          <Target className="h-6 w-6 text-primary" />
+          <h2 className="text-xl font-semibold">Match Analysis</h2>
+        </div>
+        <div className="flex flex-col md:flex-row gap-6">
+          <div className="flex-shrink-0 flex flex-col items-center justify-center p-4 bg-muted rounded-lg w-full md:w-32">
+            <span className="text-3xl font-bold text-primary">{data.match_percentage}%</span>
+            <span className="text-xs text-muted-foreground text-center mt-1">Initial Match</span>
+          </div>
+          <div className="flex-grow">
+            <h3 className="text-sm font-semibold mb-2">Identified Skill Gaps to Address:</h3>
+            {data.missing_skills.length > 0 ? (
+              <ul className="list-disc pl-5 space-y-1">
+                {data.missing_skills.map((skill, index) => (
+                  <li key={index} className="text-sm text-card-foreground/80">{skill}</li>
+                ))}
+              </ul>
+            ) : (
+              <p className="text-sm text-card-foreground/80">No significant skill gaps identified. Strong match!</p>
+            )}
+          </div>
+        </div>
+      </div>
+
       <OutputCard
         title="Tailored CV"
         icon={<FileText className="h-5 w-5" />}
