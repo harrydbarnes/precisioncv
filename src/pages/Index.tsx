@@ -8,14 +8,14 @@ import FileUpload from "@/components/cv-optimiser/FileUpload";
 import JobSpecInput from "@/components/cv-optimiser/JobSpecInput";
 import LoadingSkeleton from "@/components/cv-optimiser/LoadingSkeleton";
 import ResultsDisplay from "@/components/cv-optimiser/ResultsDisplay";
-import TailorSection, { TailorStyle } from "@/components/cv-optimiser/TailorSection";
+import TailorSection from "@/components/cv-optimiser/TailorSection";
 import Footer from "@/components/Footer";
-import { callGeminiApi, type GeminiResponse } from "@/lib/gemini-api";
+import { callGeminiApi, type GeminiResponse, type TailorStyle } from "@/lib/gemini-api";
 import { useToast } from "@/hooks/use-toast";
 
 const Index = () => {
   const [apiKey, setApiKey] = useState(() => sessionStorage.getItem("gemini-key") || "");
-  const [saveKey, setSaveKey] = useState(true);
+  const [saveKey, setSaveKey] = useState(() => localStorage.getItem("save-gemini-key") !== "false");
   const [cvText, setCvText] = useState("");
   const [jobSpecText, setJobSpecText] = useState("");
   const [keywords, setKeywords] = useState("");
@@ -24,6 +24,11 @@ const Index = () => {
   const [results, setResults] = useState<GeminiResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
+
+  // Persist saveKey preference
+  useEffect(() => {
+    localStorage.setItem("save-gemini-key", String(saveKey));
+  }, [saveKey]);
 
   // Persist API key in session storage
   useEffect(() => {
