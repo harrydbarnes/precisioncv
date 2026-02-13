@@ -66,6 +66,10 @@ const Index = () => {
 
   useEffect(() => {
     localStorage.setItem("save-cv-pref", String(saveCV));
+    if (!saveCV) {
+      localStorage.removeItem("saved-cvs");
+      setSavedCVs([]);
+    }
   }, [saveCV]);
 
   useEffect(() => {
