@@ -166,10 +166,15 @@ ${selectedStylesInstructions}
       !parsed ||
       typeof parsed.match_percentage !== "number" ||
       !Array.isArray(parsed.missing_skills) ||
-      !parsed.tailored_cv ||
-      !parsed.cover_letter ||
+      !parsed.missing_skills.every((skill) => typeof skill === "string") ||
+      typeof parsed.tailored_cv !== "string" ||
+      typeof parsed.cover_letter !== "string" ||
       !Array.isArray(parsed.interview_qna) ||
-      !Array.isArray(parsed.industry_updates)
+      !parsed.interview_qna.every(
+        (qa) => qa && typeof qa.question === "string" && typeof qa.answer === "string"
+      ) ||
+      !Array.isArray(parsed.industry_updates) ||
+      !parsed.industry_updates.every((update) => typeof update === "string")
     ) {
       throw new Error(
         "The API response is missing required fields or has an invalid structure."

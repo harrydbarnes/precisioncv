@@ -43,7 +43,10 @@ const Index = () => {
   });
   const [cvText, setCvText] = useState("");
   const [currentFileName, setCurrentFileName] = useState<string | null>(null);
-  const [jobSpecText, setJobSpecText] = useState("");
+  const [jobSpecText, setJobSpecText] = useState(() => {
+    if (typeof window === "undefined") return "";
+    return localStorage.getItem("saved-job-spec") || "";
+  });
   const debouncedJobSpecText = useDebounce(jobSpecText, 500);
   const [keywords, setKeywords] = useState("");
   const [styles, setStyles] = useState<TailorStyle[]>(["Precision"]);
@@ -77,13 +80,6 @@ const Index = () => {
   useEffect(() => {
     localStorage.setItem("saved-cvs", JSON.stringify(savedCVs));
   }, [savedCVs]);
-
-  useEffect(() => {
-    const saved = localStorage.getItem("saved-job-spec");
-    if (saved) {
-      setJobSpecText(saved);
-    }
-  }, []);
 
   useEffect(() => {
     localStorage.setItem("saved-job-spec", debouncedJobSpecText);
