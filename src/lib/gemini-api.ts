@@ -47,15 +47,15 @@ export async function callGeminiApi(
 
   const userPrompt = `Below is a candidate's CV and a job specification. Please process them according to the system instructions.
 ### CANDIDATE CV ###
-${cvText}
+${cvText.replace(/###/g, "# # #")}
 ### END CANDIDATE CV ###
 
 ### JOB SPECIFICATION ###
-${jobSpecText}
+${jobSpecText.replace(/###/g, "# # #")}
 ### END JOB SPECIFICATION ###
 
 ### ADDITIONAL KEYWORDS ###
-${keywords}
+${keywords.replace(/###/g, "# # #")}
 ### END ADDITIONAL KEYWORDS ###
 
 ### STYLE INSTRUCTIONS ###
