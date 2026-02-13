@@ -1,16 +1,15 @@
 import { useCallback, useState } from "react";
 import { motion } from "framer-motion";
-import { Upload, FileText, X, Loader2, Trash2 } from "lucide-react";
+import { Upload, FileText, X, Loader2, Trash2, ChevronDown } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -155,20 +154,25 @@ const FileUpload = ({
       ) : (
         <div className="space-y-4">
           {savedCVs.length > 0 && (
-            <Select onValueChange={handleSelectCV}>
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="Select a saved CV" />
-              </SelectTrigger>
-              <SelectContent>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" className="w-full justify-between font-normal">
+                  <span className="truncate">Select a saved CV</span>
+                  <ChevronDown className="ml-2 h-4 w-4 opacity-50" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-[var(--radix-dropdown-menu-trigger-width)]">
                 {savedCVs.map((cv) => (
-                  <div key={cv.name} className="relative group">
-                    <SelectItem value={cv.name} className="pr-8 cursor-pointer">
-                      {cv.name}
-                    </SelectItem>
+                  <DropdownMenuItem
+                    key={cv.name}
+                    className="flex items-center justify-between cursor-pointer"
+                    onSelect={() => handleSelectCV(cv.name)}
+                  >
+                    <span className="truncate pr-8">{cv.name}</span>
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="absolute right-1 top-1/2 -translate-y-1/2 h-6 w-6 z-50 hover:bg-destructive/10 hover:text-destructive"
+                      className="h-6 w-6 hover:bg-destructive/10 hover:text-destructive shrink-0"
                       onClick={(e) => {
                         e.preventDefault();
                         e.stopPropagation();
@@ -177,10 +181,10 @@ const FileUpload = ({
                     >
                       <Trash2 className="h-3 w-3" />
                     </Button>
-                  </div>
+                  </DropdownMenuItem>
                 ))}
-              </SelectContent>
-            </Select>
+              </DropdownMenuContent>
+            </DropdownMenu>
           )}
 
           <label
