@@ -29,7 +29,7 @@ const Header = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
         >
-          <span className="gradient-neon-text">CV Optimiser</span>
+          <span className="text-hero-900">Precision CV</span>
         </motion.h1>
 
         <motion.p

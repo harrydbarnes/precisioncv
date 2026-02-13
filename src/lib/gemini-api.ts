@@ -24,7 +24,9 @@ export interface GeminiResponse {
 export async function callGeminiApi(
   apiKey: string,
   cvText: string,
-  jobSpecText: string
+  jobSpecText: string,
+  keywords: string = "",
+  style: string = "Precision"
 ): Promise<GeminiResponse> {
   if (!apiKey.trim()) {
     throw new Error("Please enter your Gemini API key.");
@@ -36,7 +38,16 @@ export async function callGeminiApi(
     throw new Error("No job specification provided. Please add the job spec before generating.");
   }
 
-  const userPrompt = `Here is my current CV:\n\n${cvText}\n\n---\n\nHere is the target Job Specification:\n\n${jobSpecText}`;
+  let styleInstruction = "";
+  if (style === "Precision") {
+    styleInstruction = "Optimise the CV to precisely match the job specification keywords and required experience.";
+  } else if (style === "Ruthless") {
+    styleInstruction = "Cut down on irrelevant details and keep the CV concise and impactful.";
+  } else if (style === "Ambitious") {
+    styleInstruction = "Push the boundaries of the candidate's experience to highlight potential and transferrable skills.";
+  }
+
+  const userPrompt = `Here is my current CV:\n\n${cvText}\n\n---\n\nHere is the target Job Specification:\n\n${jobSpecText}\n\n---\n\nAdditional Instructions:\nKeywords to add: ${keywords}\nStyle: ${style} - ${styleInstruction}`;
 
   const requestBody = {
     system_instruction: {

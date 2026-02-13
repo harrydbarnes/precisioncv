@@ -45,13 +45,13 @@ const JobSpecInput = ({ value, onChange, onError }: JobSpecInputProps) => {
 
       <Tabs defaultValue="text" className="w-full">
         <TabsList className="mb-3 w-full grid grid-cols-3">
-          <TabsTrigger value="text" className="text-xs sm:text-sm">
+          <TabsTrigger value="text" className="text-xs sm:text-sm hover:bg-hero-100 hover:text-hero-800 transition-colors">
             Paste Text
           </TabsTrigger>
-          <TabsTrigger value="file" className="text-xs sm:text-sm">
+          <TabsTrigger value="file" className="text-xs sm:text-sm hover:bg-hero-100 hover:text-hero-800 transition-colors">
             Upload File
           </TabsTrigger>
-          <TabsTrigger value="url" className="text-xs sm:text-sm">
+          <TabsTrigger value="url" className="text-xs sm:text-sm hover:bg-hero-100 hover:text-hero-800 transition-colors">
             From URL
           </TabsTrigger>
         </TabsList>

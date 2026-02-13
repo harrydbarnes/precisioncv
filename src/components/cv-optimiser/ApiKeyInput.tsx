@@ -4,14 +4,17 @@ import { Eye, EyeOff, Key } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
+import { Switch } from "@/components/ui/switch";
 
 interface ApiKeyInputProps {
   value: string;
   onChange: (value: string) => void;
+  saveKey: boolean;
+  onSaveKeyChange: (save: boolean) => void;
 }
 
 /** Password-masked input for the Gemini API key */
-const ApiKeyInput = ({ value, onChange }: ApiKeyInputProps) => {
+const ApiKeyInput = ({ value, onChange, saveKey, onSaveKeyChange }: ApiKeyInputProps) => {
   const [visible, setVisible] = useState(false);
 
   return (
@@ -20,10 +23,20 @@ const ApiKeyInput = ({ value, onChange }: ApiKeyInputProps) => {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
     >
-      <Label htmlFor="api-key" className="mb-2 flex items-center gap-2 text-sm font-semibold">
-        <Key className="h-4 w-4 text-primary" />
-        Gemini API Key
-      </Label>
+      <div className="flex items-center justify-between mb-2">
+        <Label htmlFor="api-key" className="flex items-center gap-2 text-sm font-semibold">
+          <Key className="h-4 w-4 text-primary" />
+          Gemini API Key
+        </Label>
+        <div className="flex items-center gap-2">
+          <Label htmlFor="save-key" className="text-xs cursor-pointer">Save API Key</Label>
+          <Switch
+            id="save-key"
+            checked={saveKey}
+            onCheckedChange={onSaveKeyChange}
+          />
+        </div>
+      </div>
       <p className="mb-2 text-xs text-muted-foreground">
         Your key is stored only in this browser session and never sent to any server other than
         the Gemini API.
