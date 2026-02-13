@@ -38,16 +38,29 @@ export async function callGeminiApi(
     throw new Error("No job specification provided. Please add the job spec before generating.");
   }
 
-  let styleInstruction = "";
-  if (style === "Precision") {
-    styleInstruction = "Optimise the CV to precisely match the job specification keywords and required experience.";
-  } else if (style === "Ruthless") {
-    styleInstruction = "Cut down on irrelevant details and keep the CV concise and impactful.";
-  } else if (style === "Ambitious") {
-    styleInstruction = "Push the boundaries of the candidate's experience to highlight potential and transferrable skills.";
-  }
+  const styleInstructions: Record<string, string> = {
+    Precision: "Optimise the CV to precisely match the job specification keywords and required experience.",
+    Ruthless: "Cut down on irrelevant details and keep the CV concise and impactful.",
+    Ambitious: "Push the boundaries of the candidate's experience to highlight potential and transferrable skills.",
+  };
+  const styleInstruction = styleInstructions[style] ?? "";
 
-  const userPrompt = `Here is my current CV:\n\n${cvText}\n\n---\n\nHere is the target Job Specification:\n\n${jobSpecText}\n\n---\n\nAdditional Instructions:\nKeywords to add: ${keywords}\nStyle: ${style} - ${styleInstruction}`;
+  const userPrompt = `Below is a candidate's CV and a job specification. Please process them according to the system instructions.
+### CANDIDATE CV ###
+${cvText}
+### END CANDIDATE CV ###
+
+### JOB SPECIFICATION ###
+${jobSpecText}
+### END JOB SPECIFICATION ###
+
+### ADDITIONAL KEYWORDS ###
+${keywords}
+### END ADDITIONAL KEYWORDS ###
+
+### STYLE INSTRUCTIONS ###
+Style: ${style} - ${styleInstruction}
+### END STYLE INSTRUCTIONS ###`;
 
   const requestBody = {
     system_instruction: {

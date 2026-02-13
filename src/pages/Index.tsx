@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Loader2, Zap, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -26,23 +26,13 @@ const Index = () => {
   const { toast } = useToast();
 
   // Persist API key in session storage
-  const handleApiKeyChange = useCallback((key: string) => {
-    setApiKey(key);
-    if (saveKey && key) {
-      sessionStorage.setItem("gemini-key", key);
-    } else {
-      sessionStorage.removeItem("gemini-key");
-    }
-  }, [saveKey]);
-
-  const handleSaveKeyChange = useCallback((save: boolean) => {
-    setSaveKey(save);
-    if (save && apiKey) {
+  useEffect(() => {
+    if (saveKey && apiKey) {
       sessionStorage.setItem("gemini-key", apiKey);
     } else {
       sessionStorage.removeItem("gemini-key");
     }
-  }, [apiKey]);
+  }, [apiKey, saveKey]);
 
   const handleError = useCallback(
     (message: string) => {
@@ -84,9 +74,9 @@ const Index = () => {
         >
           <ApiKeyInput
             value={apiKey}
-            onChange={handleApiKeyChange}
+            onChange={setApiKey}
             saveKey={saveKey}
-            onSaveKeyChange={handleSaveKeyChange}
+            onSaveKeyChange={setSaveKey}
           />
 
           <FileUpload
