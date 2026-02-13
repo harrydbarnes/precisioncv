@@ -40,12 +40,7 @@ describe('callGeminiApi', () => {
       text: async () => '',
     });
 
-    try {
-      await callGeminiApi(apiKey, cvText, jobSpecText);
-    } catch (error) {
-      // Ignore errors related to response parsing if any, focus on the fetch call
-      console.error(error);
-    }
+    await callGeminiApi(apiKey, cvText, jobSpecText);
 
     expect(global.fetch).toHaveBeenCalledTimes(1);
 
