@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Loader2, Zap, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -8,27 +8,31 @@ import FileUpload from "@/components/cv-optimiser/FileUpload";
 import JobSpecInput from "@/components/cv-optimiser/JobSpecInput";
 import LoadingSkeleton from "@/components/cv-optimiser/LoadingSkeleton";
 import ResultsDisplay from "@/components/cv-optimiser/ResultsDisplay";
+import TailorSection, { TailorStyle } from "@/components/cv-optimiser/TailorSection";
+import Footer from "@/components/Footer";
 import { callGeminiApi, type GeminiResponse } from "@/lib/gemini-api";
 import { useToast } from "@/hooks/use-toast";
 
 const Index = () => {
   const [apiKey, setApiKey] = useState(() => sessionStorage.getItem("gemini-key") || "");
+  const [saveKey, setSaveKey] = useState(true);
   const [cvText, setCvText] = useState("");
   const [jobSpecText, setJobSpecText] = useState("");
+  const [keywords, setKeywords] = useState("");
+  const [style, setStyle] = useState<TailorStyle>("Precision");
   const [loading, setLoading] = useState(false);
   const [results, setResults] = useState<GeminiResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
 
   // Persist API key in session storage
-  const handleApiKeyChange = useCallback((key: string) => {
-    setApiKey(key);
-    if (key) {
-      sessionStorage.setItem("gemini-key", key);
+  useEffect(() => {
+    if (saveKey && apiKey) {
+      sessionStorage.setItem("gemini-key", apiKey);
     } else {
       sessionStorage.removeItem("gemini-key");
     }
-  }, []);
+  }, [apiKey, saveKey]);
 
   const handleError = useCallback(
     (message: string) => {
@@ -44,7 +48,7 @@ const Index = () => {
     setLoading(true);
 
     try {
-      const data = await callGeminiApi(apiKey, cvText, jobSpecText);
+      const data = await callGeminiApi(apiKey, cvText, jobSpecText, keywords, style);
       setResults(data);
       toast({ title: "Success", description: "Your optimised content is ready." });
     } catch (err: any) {
@@ -68,7 +72,12 @@ const Index = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
         >
-          <ApiKeyInput value={apiKey} onChange={handleApiKeyChange} />
+          <ApiKeyInput
+            value={apiKey}
+            onChange={setApiKey}
+            saveKey={saveKey}
+            onSaveKeyChange={setSaveKey}
+          />
 
           <FileUpload
             label="Upload Your CV"
@@ -78,6 +87,13 @@ const Index = () => {
           />
 
           <JobSpecInput value={jobSpecText} onChange={setJobSpecText} onError={handleError} />
+
+          <TailorSection
+            keywords={keywords}
+            setKeywords={setKeywords}
+            style={style}
+            setStyle={setStyle}
+          />
 
           {/* Error banner */}
           <AnimatePresence>
@@ -99,7 +115,7 @@ const Index = () => {
             onClick={handleGenerate}
             disabled={!canGenerate}
             size="lg"
-            className="w-full gap-2 text-base font-semibold gradient-neon text-primary-foreground transition-all duration-300 hover:neon-glow-strong disabled:opacity-50"
+            className="w-full gap-2 text-base font-semibold bg-hero-500 text-hero-800 transition-all duration-300 hover:bg-hero-600 disabled:opacity-50"
           >
             {loading ? (
               <>
@@ -144,6 +160,8 @@ const Index = () => {
           </AnimatePresence>
         </section>
       </main>
+
+      <Footer />
     </div>
   );
 };

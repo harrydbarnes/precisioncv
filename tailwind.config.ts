@@ -61,6 +61,14 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
+        hero: {
+          900: "#222a00", // Darkest
+          800: "#445500",
+          700: "#668000",
+          600: "#88aa00",
+          500: "#aad400",
+          100: "#ccff00", // Lightest
+        },
         neon: {
           yellow: "hsl(var(--neon-yellow))",
           green: "hsl(var(--neon-green))",

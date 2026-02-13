@@ -84,8 +84,8 @@ const FileUpload = ({ label, description, onTextExtracted, onError }: FileUpload
         <label
           className={`flex cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed p-6 transition-all duration-300 ${
             dragOver
-              ? "border-primary bg-primary/10 neon-glow"
-              : "border-border hover:border-primary/50 hover:bg-primary/5"
+              ? "border-hero-500 bg-hero-100/20"
+              : "border-border hover:border-hero-500 hover:bg-hero-100/10"
           }`}
           onDragOver={(e) => {
             e.preventDefault();
