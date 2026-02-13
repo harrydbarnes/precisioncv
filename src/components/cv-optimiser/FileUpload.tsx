@@ -1,38 +1,83 @@
 import { useCallback, useState } from "react";
 import { motion } from "framer-motion";
-import { Upload, FileText, X, Loader2 } from "lucide-react";
+import { Upload, FileText, X, Loader2, Trash2 } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
+import { Switch } from "@/components/ui/switch";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { extractTextFromFile } from "@/lib/extract-text";
+
+export interface SavedCV {
+  name: string;
+  content: string;
+  date: number;
+}
 
 interface FileUploadProps {
   label: string;
   description?: string;
-  onTextExtracted: (text: string) => void;
+  onTextExtracted: (text: string, fileName: string) => void;
   onError: (error: string) => void;
+  saveCV?: boolean;
+  onSaveCVChange?: (checked: boolean) => void;
+  savedCVs?: SavedCV[];
+  onSelectCV?: (cv: SavedCV) => void;
+  onDeleteCV?: (name: string) => void;
+  fileName?: string | null;
 }
 
 /** Drag-and-drop file upload with text extraction */
-const FileUpload = ({ label, description, onTextExtracted, onError }: FileUploadProps) => {
-  const [fileName, setFileName] = useState<string | null>(null);
+const FileUpload = ({
+  label,
+  description,
+  onTextExtracted,
+  onError,
+  saveCV = false,
+  onSaveCVChange,
+  savedCVs = [],
+  onSelectCV,
+  onDeleteCV,
+  fileName: externalFileName,
+}: FileUploadProps) => {
+  const [internalFileName, setInternalFileName] = useState<string | null>(null);
+  const fileName = externalFileName !== undefined ? externalFileName : internalFileName;
+
   const [extracting, setExtracting] = useState(false);
   const [dragOver, setDragOver] = useState(false);
+  const [deleteId, setDeleteId] = useState<string | null>(null);
 
   const handleFile = useCallback(
     async (file: File) => {
-      setFileName(file.name);
+      if (externalFileName === undefined) setInternalFileName(file.name);
       setExtracting(true);
       try {
         const text = await extractTextFromFile(file);
-        onTextExtracted(text);
+        onTextExtracted(text, file.name);
       } catch (err: any) {
         onError(err.message || "Failed to extract text from the file.");
-        setFileName(null);
+        if (externalFileName === undefined) setInternalFileName(null);
       } finally {
         setExtracting(false);
       }
     },
-    [onTextExtracted, onError]
+    [onTextExtracted, onError, externalFileName]
   );
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -48,19 +93,47 @@ const FileUpload = ({ label, description, onTextExtracted, onError }: FileUpload
   };
 
   const clear = () => {
-    setFileName(null);
-    onTextExtracted("");
+    if (externalFileName === undefined) setInternalFileName(null);
+    onTextExtracted("", "");
+  };
+
+  const handleSelectCV = (value: string) => {
+    const cv = savedCVs.find((c) => c.name === value);
+    if (cv) {
+      if (externalFileName === undefined) setInternalFileName(cv.name);
+      onSelectCV?.(cv);
+    }
   };
 
   return (
     <div>
-      <Label className="mb-2 flex items-center gap-2 text-sm font-semibold">
-        <FileText className="h-4 w-4 text-primary" />
-        {label}
-      </Label>
+      <div className="flex items-center justify-between mb-2">
+        <Label className="flex items-center gap-2 text-sm font-semibold">
+          <FileText className="h-4 w-4 text-primary" />
+          {label}
+        </Label>
+        {onSaveCVChange && (
+          <div className="flex items-center gap-2">
+            <Label htmlFor="save-cv" className="text-xs cursor-pointer">
+              Save CV
+            </Label>
+            <Switch
+              id="save-cv"
+              checked={saveCV}
+              onCheckedChange={onSaveCVChange}
+            />
+          </div>
+        )}
+      </div>
+
       {description && (
         <p className="mb-2 text-xs text-muted-foreground">{description}</p>
       )}
+
+      <p className="mb-2 text-xs text-muted-foreground">
+        Your CV is stored locally in your browser. It is sent to the Gemini API for processing but
+        is not stored on our servers.
+      </p>
 
       {fileName ? (
         <motion.div
@@ -81,33 +154,93 @@ const FileUpload = ({ label, description, onTextExtracted, onError }: FileUpload
           )}
         </motion.div>
       ) : (
-        <label
-          className={`flex cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed p-6 transition-all duration-300 ${
-            dragOver
-              ? "border-hero-500 bg-hero-100/20"
-              : "border-border hover:border-hero-500 hover:bg-hero-100/10"
-          }`}
-          onDragOver={(e) => {
-            e.preventDefault();
-            setDragOver(true);
-          }}
-          onDragLeave={() => setDragOver(false)}
-          onDrop={handleDrop}
-        >
-          <Upload className="mb-2 h-8 w-8 text-muted-foreground" />
-          <span className="text-sm font-medium text-muted-foreground">
-            Drop a file here or click to browse
-          </span>
-          <span className="mt-1 text-xs text-muted-foreground">
-            Accepts .pdf, .docx, .txt
-          </span>
-          <input
-            type="file"
-            accept=".pdf,.docx,.txt"
-            className="hidden"
-            onChange={handleInputChange}
-          />
-        </label>
+        <div className="space-y-4">
+          {savedCVs.length > 0 && (
+            <Select onValueChange={handleSelectCV}>
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Select a saved CV" />
+              </SelectTrigger>
+              <SelectContent>
+                {savedCVs.map((cv) => (
+                  <div
+                    key={cv.name}
+                    className="flex items-center justify-between w-full px-2 py-1.5 hover:bg-accent hover:text-accent-foreground cursor-pointer rounded-sm text-sm"
+                    onClick={(e) => {
+                       // This handles the click on the item container
+                       handleSelectCV(cv.name);
+                    }}
+                  >
+                    <span className="flex-1 truncate pr-2">{cv.name}</span>
+                    <AlertDialog open={deleteId === cv.name} onOpenChange={(open) => !open && setDeleteId(null)}>
+                      <AlertDialogTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-6 w-6 shrink-0 hover:bg-destructive/10 hover:text-destructive z-10"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setDeleteId(cv.name);
+                          }}
+                        >
+                          <Trash2 className="h-3 w-3" />
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent onClick={(e) => e.stopPropagation()}>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>Delete Saved CV?</AlertDialogTitle>
+                          <AlertDialogDescription>
+                            Are you sure you want to delete "{cv.name}"? This action cannot be undone.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel onClick={() => setDeleteId(null)}>Cancel</AlertDialogCancel>
+                          <AlertDialogAction
+                            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              onDeleteCV?.(cv.name);
+                              setDeleteId(null);
+                            }}
+                          >
+                            Delete
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                  </div>
+                ))}
+              </SelectContent>
+            </Select>
+          )}
+
+          <label
+            className={`flex cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed p-6 transition-all duration-300 ${
+              dragOver
+                ? "border-hero-500 bg-hero-100/20"
+                : "border-border hover:border-hero-500 hover:bg-hero-100/10"
+            }`}
+            onDragOver={(e) => {
+              e.preventDefault();
+              setDragOver(true);
+            }}
+            onDragLeave={() => setDragOver(false)}
+            onDrop={handleDrop}
+          >
+            <Upload className="mb-2 h-8 w-8 text-muted-foreground" />
+            <span className="text-sm font-medium text-muted-foreground">
+              Drop a file here or click to browse
+            </span>
+            <span className="mt-1 text-xs text-muted-foreground">
+              Accepts .pdf, .docx, .txt
+            </span>
+            <input
+              type="file"
+              accept=".pdf,.docx,.txt"
+              className="hidden"
+              onChange={handleInputChange}
+            />
+          </label>
+        </div>
       )}
     </div>
   );

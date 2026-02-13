@@ -1,10 +1,16 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Eye, EyeOff, Key } from "lucide-react";
+import { Eye, EyeOff, Key, Info } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface ApiKeyInputProps {
   value: string;
@@ -24,10 +30,32 @@ const ApiKeyInput = ({ value, onChange, saveKey, onSaveKeyChange }: ApiKeyInputP
       transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
     >
       <div className="flex items-center justify-between mb-2">
-        <Label htmlFor="api-key" className="flex items-center gap-2 text-sm font-semibold">
-          <Key className="h-4 w-4 text-primary" />
-          Gemini API Key
-        </Label>
+        <div className="flex items-center gap-2">
+          <Label htmlFor="api-key" className="flex items-center gap-2 text-sm font-semibold">
+            <Key className="h-4 w-4 text-primary" />
+            Gemini API Key
+          </Label>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Info className="h-4 w-4 cursor-pointer text-muted-foreground hover:text-primary transition-colors" />
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>
+                  Get your API key from{" "}
+                  <a
+                    href="https://aistudio.google.com/app/apikey"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="underline font-semibold"
+                  >
+                    Google AI Studio
+                  </a>
+                </p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        </div>
         <div className="flex items-center gap-2">
           <Label htmlFor="save-key" className="text-xs cursor-pointer">Save API Key</Label>
           <Switch

@@ -28,7 +28,7 @@ export async function callGeminiApi(
   cvText: string,
   jobSpecText: string,
   keywords: string = "",
-  style: TailorStyle = "Precision"
+  styles: TailorStyle[] = ["Precision"]
 ): Promise<GeminiResponse> {
   if (!apiKey.trim()) {
     throw new Error("Please enter your Gemini API key.");
@@ -45,7 +45,10 @@ export async function callGeminiApi(
     Ruthless: "Cut down on irrelevant details and keep the CV concise and impactful.",
     Ambitious: "Push the boundaries of the candidate's experience to highlight potential and transferrable skills.",
   };
-  const styleInstruction = styleInstructions[style] ?? "";
+
+  const selectedStylesInstructions = styles
+    .map((s) => `${s}: ${styleInstructions[s]}`)
+    .join("\n");
 
   const userPrompt = `Below is a candidate's CV and a job specification. Please process them according to the system instructions.
 ### CANDIDATE CV ###
@@ -61,7 +64,8 @@ ${keywords.replace(/###/g, "# # #")}
 ### END ADDITIONAL KEYWORDS ###
 
 ### STYLE INSTRUCTIONS ###
-Style: ${style} - ${styleInstruction}
+The user has selected the following style(s):
+${selectedStylesInstructions}
 ### END STYLE INSTRUCTIONS ###`;
 
   const requestBody = {
