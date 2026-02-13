@@ -14,29 +14,37 @@ import { TailorStyle } from "@/lib/gemini-api";
 interface TailorSectionProps {
   keywords: string;
   setKeywords: (value: string) => void;
-  style: TailorStyle;
-  setStyle: (value: TailorStyle) => void;
+  selectedStyles: TailorStyle[];
+  setSelectedStyles: (value: TailorStyle[]) => void;
 }
 
 const styles: { id: TailorStyle; label: string; description: string }[] = [
   {
     id: "Precision",
     label: "Precision",
-    description: "Updates precisely to match what is on job spec key words and required experience.",
+    description: "Updates precisely to match what is on job spec key words and required experience",
   },
   {
     id: "Ruthless",
     label: "Ruthless",
-    description: "Helps cut down on crap.",
+    description: "Helps cut down on crap",
   },
   {
     id: "Ambitious",
     label: "Ambitious",
-    description: "Helps push the boundaries of your CV.",
+    description: "Helps push the boundaries of your CV",
   },
 ];
 
-const TailorSection = ({ keywords, setKeywords, style, setStyle }: TailorSectionProps) => {
+const TailorSection = ({ keywords, setKeywords, selectedStyles, setSelectedStyles }: TailorSectionProps) => {
+  const toggleStyle = (id: TailorStyle) => {
+    if (selectedStyles.includes(id)) {
+      setSelectedStyles(selectedStyles.filter((s) => s !== id));
+    } else {
+      setSelectedStyles([...selectedStyles, id]);
+    }
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -58,27 +66,30 @@ const TailorSection = ({ keywords, setKeywords, style, setStyle }: TailorSection
         <Label className="text-sm font-semibold">Update Style</Label>
         <div className="flex flex-wrap gap-3">
           <TooltipProvider>
-            {styles.map((s) => (
-              <Tooltip key={s.id}>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant={style === s.id ? "default" : "outline"}
-                    onClick={() => setStyle(s.id)}
-                    className={`gap-2 transition-all duration-200 ${
-                      style === s.id
-                        ? "bg-hero-500 text-hero-800 hover:bg-hero-600 border-hero-500"
-                        : "hover:bg-hero-100/50 hover:text-hero-800 hover:border-hero-500"
-                    }`}
-                  >
-                    {s.label}
-                    <Info className="h-4 w-4 opacity-50" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>{s.description}</p>
-                </TooltipContent>
-              </Tooltip>
-            ))}
+            {styles.map((s) => {
+              const isSelected = selectedStyles.includes(s.id);
+              return (
+                <Tooltip key={s.id}>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant={isSelected ? "default" : "outline"}
+                      onClick={() => toggleStyle(s.id)}
+                      className={`gap-2 transition-all duration-200 ${
+                        isSelected
+                          ? "bg-hero-500 text-hero-800 hover:bg-hero-600 border-hero-500 ring-2 ring-hero-500 ring-offset-2"
+                          : "hover:bg-hero-100/50 hover:text-hero-800 hover:border-hero-500"
+                      }`}
+                    >
+                      {s.label}
+                      <Info className="h-4 w-4 opacity-50" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>{s.description}</p>
+                  </TooltipContent>
+                </Tooltip>
+              );
+            })}
           </TooltipProvider>
         </div>
       </div>

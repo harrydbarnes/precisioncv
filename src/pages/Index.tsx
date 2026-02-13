@@ -4,7 +4,7 @@ import { Loader2, Zap, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Header from "@/components/cv-optimiser/Header";
 import ApiKeyInput from "@/components/cv-optimiser/ApiKeyInput";
-import FileUpload from "@/components/cv-optimiser/FileUpload";
+import FileUpload, { type SavedCV } from "@/components/cv-optimiser/FileUpload";
 import JobSpecInput from "@/components/cv-optimiser/JobSpecInput";
 import LoadingSkeleton from "@/components/cv-optimiser/LoadingSkeleton";
 import ResultsDisplay from "@/components/cv-optimiser/ResultsDisplay";
@@ -12,6 +12,12 @@ import TailorSection from "@/components/cv-optimiser/TailorSection";
 import Footer from "@/components/Footer";
 import { callGeminiApi, type GeminiResponse, type TailorStyle } from "@/lib/gemini-api";
 import { useToast } from "@/hooks/use-toast";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 const Index = () => {
   const [apiKey, setApiKey] = useState(() => sessionStorage.getItem("gemini-key") || "");
@@ -21,10 +27,24 @@ const Index = () => {
     }
     return localStorage.getItem("save-gemini-key") !== "false";
   });
+  const [savedCVs, setSavedCVs] = useState<SavedCV[]>(() => {
+    if (typeof window === "undefined") return [];
+    try {
+      const saved = localStorage.getItem("saved-cvs");
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
+  });
+  const [saveCV, setSaveCV] = useState(() => {
+    if (typeof window === "undefined") return false;
+    return localStorage.getItem("save-cv-pref") === "true";
+  });
   const [cvText, setCvText] = useState("");
+  const [currentFileName, setCurrentFileName] = useState<string | null>(null);
   const [jobSpecText, setJobSpecText] = useState("");
   const [keywords, setKeywords] = useState("");
-  const [style, setStyle] = useState<TailorStyle>("Precision");
+  const [styles, setStyles] = useState<TailorStyle[]>(["Precision"]);
   const [loading, setLoading] = useState(false);
   const [results, setResults] = useState<GeminiResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -44,6 +64,58 @@ const Index = () => {
     }
   }, [apiKey, saveKey]);
 
+  useEffect(() => {
+    localStorage.setItem("save-cv-pref", String(saveCV));
+    if (!saveCV) {
+      localStorage.removeItem("saved-cvs");
+      setSavedCVs([]);
+    }
+  }, [saveCV]);
+
+  useEffect(() => {
+    localStorage.setItem("saved-cvs", JSON.stringify(savedCVs));
+  }, [savedCVs]);
+
+  useEffect(() => {
+    if (saveCV && savedCVs.length > 0 && !cvText && !currentFileName) {
+      const sorted = [...savedCVs].sort((a, b) => b.date - a.date);
+      const last = sorted[0];
+      setCvText(last.content);
+      setCurrentFileName(last.name);
+    }
+  }, []);
+
+  const handleCvExtracted = (text: string, fileName: string) => {
+    setCvText(text);
+    setCurrentFileName(fileName || null);
+
+    if (text && fileName && saveCV) {
+      setSavedCVs((prev) => {
+        const existingIndex = prev.findIndex((c) => c.name === fileName);
+        const newCV = { name: fileName, content: text, date: Date.now() };
+        if (existingIndex >= 0) {
+          const newArr = [...prev];
+          newArr[existingIndex] = newCV;
+          return newArr;
+        }
+        return [...prev, newCV];
+      });
+    }
+  };
+
+  const handleSelectCV = (cv: SavedCV) => {
+    setCvText(cv.content);
+    setCurrentFileName(cv.name);
+  };
+
+  const handleDeleteCV = (name: string) => {
+    setSavedCVs((prev) => prev.filter((c) => c.name !== name));
+    if (currentFileName === name) {
+      setCvText("");
+      setCurrentFileName(null);
+    }
+  };
+
   const handleError = useCallback(
     (message: string) => {
       setError(message);
@@ -58,7 +130,7 @@ const Index = () => {
     setLoading(true);
 
     try {
-      const data = await callGeminiApi(apiKey, cvText, jobSpecText, keywords, style);
+      const data = await callGeminiApi(apiKey, cvText, jobSpecText, keywords, styles);
       setResults(data);
       toast({ title: "Success", description: "Your optimised content is ready." });
     } catch (err: any) {
@@ -68,7 +140,12 @@ const Index = () => {
     }
   };
 
-  const canGenerate = apiKey.trim() && cvText.trim() && jobSpecText.trim() && !loading;
+  const missingRequirements: string[] = [];
+  if (!apiKey.trim()) missingRequirements.push("Gemini API Key");
+  if (!cvText.trim()) missingRequirements.push("CV Upload");
+  if (!jobSpecText.trim()) missingRequirements.push("Job Specification");
+
+  const canGenerate = missingRequirements.length === 0 && !loading;
 
   return (
     <div className="min-h-screen bg-background">
@@ -92,8 +169,14 @@ const Index = () => {
           <FileUpload
             label="Upload Your CV"
             description="Upload your current CV to be optimised for the target role."
-            onTextExtracted={setCvText}
+            onTextExtracted={handleCvExtracted}
             onError={handleError}
+            saveCV={saveCV}
+            onSaveCVChange={setSaveCV}
+            savedCVs={savedCVs}
+            onSelectCV={handleSelectCV}
+            onDeleteCV={handleDeleteCV}
+            fileName={currentFileName}
           />
 
           <JobSpecInput value={jobSpecText} onChange={setJobSpecText} onError={handleError} />
@@ -101,8 +184,8 @@ const Index = () => {
           <TailorSection
             keywords={keywords}
             setKeywords={setKeywords}
-            style={style}
-            setStyle={setStyle}
+            selectedStyles={styles}
+            setSelectedStyles={setStyles}
           />
 
           {/* Error banner */}
@@ -121,24 +204,37 @@ const Index = () => {
           </AnimatePresence>
 
           {/* Generate button */}
-          <Button
-            onClick={handleGenerate}
-            disabled={!canGenerate}
-            size="lg"
-            className="w-full gap-2 text-base font-semibold bg-hero-500 text-hero-800 transition-all duration-300 hover:bg-hero-600 disabled:opacity-50"
-          >
-            {loading ? (
-              <>
-                <Loader2 className="h-5 w-5 animate-spin" />
-                Generating...
-              </>
-            ) : (
-              <>
-                <Zap className="h-5 w-5" />
-                Generate
-              </>
-            )}
-          </Button>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <div className="w-full cursor-not-allowed">
+                  <Button
+                    onClick={handleGenerate}
+                    disabled={!canGenerate}
+                    size="lg"
+                    className="w-full gap-2 text-base font-semibold bg-hero-500 text-hero-800 transition-all duration-300 hover:bg-hero-600 disabled:opacity-50 disabled:pointer-events-none"
+                  >
+                    {loading ? (
+                      <>
+                        <Loader2 className="h-5 w-5 animate-spin" />
+                        Generating...
+                      </>
+                    ) : (
+                      <>
+                        <Zap className="h-5 w-5" />
+                        Generate
+                      </>
+                    )}
+                  </Button>
+                </div>
+              </TooltipTrigger>
+              {!canGenerate && (
+                <TooltipContent className="bg-[#ff000d] border-[#ff000d] text-white">
+                  <p>Please provide: {missingRequirements.join(", ")}</p>
+                </TooltipContent>
+              )}
+            </Tooltip>
+          </TooltipProvider>
         </motion.section>
 
         {/* Output section */}
