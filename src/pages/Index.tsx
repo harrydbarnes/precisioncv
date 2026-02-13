@@ -15,7 +15,12 @@ import { useToast } from "@/hooks/use-toast";
 
 const Index = () => {
   const [apiKey, setApiKey] = useState(() => sessionStorage.getItem("gemini-key") || "");
-  const [saveKey, setSaveKey] = useState(() => localStorage.getItem("save-gemini-key") !== "false");
+  const [saveKey, setSaveKey] = useState(() => {
+    if (typeof window === "undefined") {
+      return true; // Default to true on the server
+    }
+    return localStorage.getItem("save-gemini-key") !== "false";
+  });
   const [cvText, setCvText] = useState("");
   const [jobSpecText, setJobSpecText] = useState("");
   const [keywords, setKeywords] = useState("");
