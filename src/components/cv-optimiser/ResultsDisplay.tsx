@@ -35,7 +35,9 @@ const ResultsDisplay = ({ data }: ResultsDisplayProps) => {
             {data.missing_skills.length > 0 ? (
               <ul className="list-disc pl-5 space-y-1">
                 {data.missing_skills.map((skill, index) => (
-                  <li key={index} className="text-sm text-card-foreground/80">{skill}</li>
+                  <li key={`${skill}-${index}`} className="text-sm text-card-foreground/80">
+                    {skill}
+                  </li>
                 ))}
               </ul>
             ) : (

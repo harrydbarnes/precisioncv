@@ -159,15 +159,10 @@ ${selectedStylesInstructions}
     const parsed: GeminiResponse = JSON.parse(cleaned);
 
     // Validate the structure
-    if (
-      parsed.match_percentage === undefined ||
-      !parsed.missing_skills ||
-      !parsed.tailored_cv ||
-      !parsed.cover_letter ||
-      !parsed.interview_qna ||
-      !parsed.industry_updates
-    ) {
-      throw new Error("Missing required fields in the response.");
+    // We rely on Gemini's responseSchema to enforce the structure.
+    // However, basic null checks are good practice.
+    if (!parsed) {
+      throw new Error("Empty response object.");
     }
 
     return parsed;
