@@ -72,12 +72,12 @@ const TailorSection = ({ keywords, setKeywords, selectedStyles, setSelectedStyle
                 <Tooltip key={s.id}>
                   <TooltipTrigger asChild>
                     <Button
-                      variant={isSelected ? "default" : "outline"}
+                      variant={isSelected ? "outline" : "default"}
                       onClick={() => toggleStyle(s.id)}
                       className={`gap-2 transition-all duration-200 ${
                         isSelected
-                          ? "bg-hero-500 text-hero-800 hover:bg-hero-600 border-hero-500 ring-2 ring-hero-500 ring-offset-2"
-                          : "hover:bg-hero-100/50 hover:text-hero-800 hover:border-hero-500"
+                          ? "hover:bg-hero-100/50 hover:text-hero-800 hover:border-hero-500"
+                          : "bg-hero-500 text-hero-800 hover:bg-hero-600 border-hero-500 ring-2 ring-hero-500 ring-offset-2"
                       }`}
                     >
                       {s.label}

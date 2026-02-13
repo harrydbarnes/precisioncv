@@ -229,7 +229,7 @@ const Index = () => {
                 </div>
               </TooltipTrigger>
               {!canGenerate && (
-                <TooltipContent className="bg-[#ff000d] border-[#ff000d] text-white">
+                <TooltipContent className="bg-destructive-tooltip border-destructive-tooltip text-white">
                   <p>Please provide: {missingRequirements.join(", ")}</p>
                 </TooltipContent>
               )}

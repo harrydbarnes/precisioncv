@@ -20,7 +20,6 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { extractTextFromFile } from "@/lib/extract-text";
 
@@ -162,51 +161,22 @@ const FileUpload = ({
               </SelectTrigger>
               <SelectContent>
                 {savedCVs.map((cv) => (
-                  <div
-                    key={cv.name}
-                    className="flex items-center justify-between w-full px-2 py-1.5 hover:bg-accent hover:text-accent-foreground cursor-pointer rounded-sm text-sm"
-                    onClick={(e) => {
-                       // This handles the click on the item container
-                       handleSelectCV(cv.name);
-                    }}
-                  >
-                    <span className="flex-1 truncate pr-2">{cv.name}</span>
-                    <AlertDialog open={deleteId === cv.name} onOpenChange={(open) => !open && setDeleteId(null)}>
-                      <AlertDialogTrigger asChild>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-6 w-6 shrink-0 hover:bg-destructive/10 hover:text-destructive z-10"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setDeleteId(cv.name);
-                          }}
-                        >
-                          <Trash2 className="h-3 w-3" />
-                        </Button>
-                      </AlertDialogTrigger>
-                      <AlertDialogContent onClick={(e) => e.stopPropagation()}>
-                        <AlertDialogHeader>
-                          <AlertDialogTitle>Delete Saved CV?</AlertDialogTitle>
-                          <AlertDialogDescription>
-                            Are you sure you want to delete "{cv.name}"? This action cannot be undone.
-                          </AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <AlertDialogFooter>
-                          <AlertDialogCancel onClick={() => setDeleteId(null)}>Cancel</AlertDialogCancel>
-                          <AlertDialogAction
-                            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              onDeleteCV?.(cv.name);
-                              setDeleteId(null);
-                            }}
-                          >
-                            Delete
-                          </AlertDialogAction>
-                        </AlertDialogFooter>
-                      </AlertDialogContent>
-                    </AlertDialog>
+                  <div key={cv.name} className="relative group">
+                    <SelectItem value={cv.name} className="pr-8 cursor-pointer">
+                      {cv.name}
+                    </SelectItem>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="absolute right-1 top-1/2 -translate-y-1/2 h-6 w-6 z-50 hover:bg-destructive/10 hover:text-destructive"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        setDeleteId(cv.name);
+                      }}
+                    >
+                      <Trash2 className="h-3 w-3" />
+                    </Button>
                   </div>
                 ))}
               </SelectContent>
@@ -242,6 +212,30 @@ const FileUpload = ({
           </label>
         </div>
       )}
+
+      <AlertDialog open={!!deleteId} onOpenChange={(open) => !open && setDeleteId(null)}>
+        <AlertDialogContent onClick={(e) => e.stopPropagation()}>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Saved CV?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete "{deleteId}"? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setDeleteId(null)}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              onClick={(e) => {
+                e.stopPropagation();
+                if (deleteId) onDeleteCV?.(deleteId);
+                setDeleteId(null);
+              }}
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
