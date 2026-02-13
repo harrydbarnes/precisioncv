@@ -160,9 +160,19 @@ ${selectedStylesInstructions}
 
     // Validate the structure
     // We rely on Gemini's responseSchema to enforce the structure.
-    // However, basic null checks are good practice.
-    if (!parsed) {
-      throw new Error("Empty response object.");
+    // However, more thorough validation on the client is good practice.
+    if (
+      !parsed ||
+      typeof parsed.match_percentage !== "number" ||
+      !Array.isArray(parsed.missing_skills) ||
+      !parsed.tailored_cv ||
+      !parsed.cover_letter ||
+      !Array.isArray(parsed.interview_qna) ||
+      !Array.isArray(parsed.industry_updates)
+    ) {
+      throw new Error(
+        "The API response is missing required fields or has an invalid structure."
+      );
     }
 
     return parsed;
