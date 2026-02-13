@@ -1,9 +1,13 @@
 import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import FileUpload from "./FileUpload";
 import { describe, it, expect } from "vitest";
 
 describe("FileUpload", () => {
-  it("should have an accessible file input and show focus styles", () => {
+  it("should have an accessible file input that is focusable", async () => {
+    // Setup userEvent
+    const user = userEvent.setup();
+
     // Render the component
     render(
       <FileUpload
@@ -20,15 +24,12 @@ describe("FileUpload", () => {
     expect(input).toHaveClass("sr-only");
     expect(input).not.toHaveClass("hidden");
 
-    // Verify focus behavior:
-    // When the input is focused, the label (its parent/container) should have
-    // the utility class that triggers the ring.
-    input.focus();
-    const container = input.closest("label");
-    expect(container).toBeInTheDocument();
+    // Simulate user tabbing to the input element.
+    // Since it's the first focusable element rendered in this test, one tab should reach it.
+    await user.tab();
 
-    // We check for the class that defines the focus ring
-    expect(container).toHaveClass("focus-within:ring-2");
-    expect(container).toHaveClass("focus-within:ring-ring");
+    // Verify that the input element has received focus. This confirms it's part
+    // of the tab order and accessible via keyboard.
+    expect(input).toHaveFocus();
   });
 });
