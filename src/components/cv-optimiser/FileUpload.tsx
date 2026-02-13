@@ -188,7 +188,7 @@ const FileUpload = ({
           )}
 
           <label
-            className={`flex cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed p-6 transition-all duration-300 ${
+            className={`flex cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed p-6 transition-all duration-300 focus-within:outline-none focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 focus-within:ring-offset-background ${
               dragOver
                 ? "border-hero-500 bg-hero-100/20"
                 : "border-border hover:border-hero-500 hover:bg-hero-100/10"
@@ -210,7 +210,7 @@ const FileUpload = ({
             <input
               type="file"
               accept=".pdf,.docx,.txt"
-              className="hidden"
+              className="sr-only"
               onChange={handleInputChange}
             />
           </label>
