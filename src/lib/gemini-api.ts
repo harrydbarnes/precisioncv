@@ -102,7 +102,8 @@ ${selectedStylesInstructions}
               properties: {
                 question: { type: "STRING" },
                 answer: { type: "STRING" }
-              }
+              },
+              required: ["question", "answer"]
             }
           },
           industry_updates: { type: "ARRAY", items: { type: "STRING" } }
