@@ -44,7 +44,7 @@ describe('callGeminiApi', () => {
 
     expect(global.fetch).toHaveBeenCalledTimes(1);
 
-    const callArgs = (global.fetch as any).mock.calls[0];
+    const callArgs = vi.mocked(global.fetch).mock.calls[0];
     const url = callArgs[0];
     const options = callArgs[1];
 
