@@ -44,7 +44,7 @@ describe('Performance Optimization', () => {
     sessionStorage.clear();
   });
 
-  it('re-renders heavy components when typing in JobSpecInput without optimization', () => {
+  it('should not re-render heavy components when typing in JobSpecInput', () => {
     render(<Index />);
 
     // Initial render might trigger multiple renders due to strict mode or hooks
