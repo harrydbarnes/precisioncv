@@ -34,7 +34,7 @@ describe('callGeminiApi', () => {
       ],
     };
 
-    (global.fetch as any).mockResolvedValue({
+    vi.mocked(global.fetch).mockResolvedValue({
       ok: true,
       json: async () => mockResponse,
       text: async () => '',
