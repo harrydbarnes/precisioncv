@@ -74,6 +74,8 @@ export default {
           green: "hsl(var(--neon-green))",
           glow: "hsl(var(--neon-glow))",
         },
+        "tooltip-blue": "#3300ff",
+        "destructive-tooltip": "#ff000d",
       },
       borderRadius: {
         lg: "var(--radius)",

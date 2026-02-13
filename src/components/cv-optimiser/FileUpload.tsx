@@ -1,16 +1,15 @@
 import { useCallback, useState } from "react";
 import { motion } from "framer-motion";
-import { Upload, FileText, X, Loader2, Trash2 } from "lucide-react";
+import { Upload, FileText, X, Loader2, Trash2, ChevronDown } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -20,7 +19,6 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { extractTextFromFile } from "@/lib/extract-text";
 
@@ -156,61 +154,37 @@ const FileUpload = ({
       ) : (
         <div className="space-y-4">
           {savedCVs.length > 0 && (
-            <Select onValueChange={handleSelectCV}>
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="Select a saved CV" />
-              </SelectTrigger>
-              <SelectContent>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" className="w-full justify-between font-normal">
+                  <span className="truncate">Select a saved CV</span>
+                  <ChevronDown className="ml-2 h-4 w-4 opacity-50" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-[var(--radix-dropdown-menu-trigger-width)]">
                 {savedCVs.map((cv) => (
-                  <div
+                  <DropdownMenuItem
                     key={cv.name}
-                    className="flex items-center justify-between w-full px-2 py-1.5 hover:bg-accent hover:text-accent-foreground cursor-pointer rounded-sm text-sm"
-                    onClick={(e) => {
-                       // This handles the click on the item container
-                       handleSelectCV(cv.name);
-                    }}
+                    className="flex items-center justify-between cursor-pointer"
+                    onSelect={() => handleSelectCV(cv.name)}
                   >
-                    <span className="flex-1 truncate pr-2">{cv.name}</span>
-                    <AlertDialog open={deleteId === cv.name} onOpenChange={(open) => !open && setDeleteId(null)}>
-                      <AlertDialogTrigger asChild>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-6 w-6 shrink-0 hover:bg-destructive/10 hover:text-destructive z-10"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setDeleteId(cv.name);
-                          }}
-                        >
-                          <Trash2 className="h-3 w-3" />
-                        </Button>
-                      </AlertDialogTrigger>
-                      <AlertDialogContent onClick={(e) => e.stopPropagation()}>
-                        <AlertDialogHeader>
-                          <AlertDialogTitle>Delete Saved CV?</AlertDialogTitle>
-                          <AlertDialogDescription>
-                            Are you sure you want to delete "{cv.name}"? This action cannot be undone.
-                          </AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <AlertDialogFooter>
-                          <AlertDialogCancel onClick={() => setDeleteId(null)}>Cancel</AlertDialogCancel>
-                          <AlertDialogAction
-                            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              onDeleteCV?.(cv.name);
-                              setDeleteId(null);
-                            }}
-                          >
-                            Delete
-                          </AlertDialogAction>
-                        </AlertDialogFooter>
-                      </AlertDialogContent>
-                    </AlertDialog>
-                  </div>
+                    <span className="truncate pr-8">{cv.name}</span>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-6 w-6 hover:bg-destructive/10 hover:text-destructive shrink-0"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        setDeleteId(cv.name);
+                      }}
+                    >
+                      <Trash2 className="h-3 w-3" />
+                    </Button>
+                  </DropdownMenuItem>
                 ))}
-              </SelectContent>
-            </Select>
+              </DropdownMenuContent>
+            </DropdownMenu>
           )}
 
           <label
@@ -242,6 +216,30 @@ const FileUpload = ({
           </label>
         </div>
       )}
+
+      <AlertDialog open={!!deleteId} onOpenChange={(open) => !open && setDeleteId(null)}>
+        <AlertDialogContent onClick={(e) => e.stopPropagation()}>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Saved CV?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete "{deleteId}"? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              onClick={(e) => {
+                e.stopPropagation();
+                if (deleteId) onDeleteCV?.(deleteId);
+                setDeleteId(null);
+              }}
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
