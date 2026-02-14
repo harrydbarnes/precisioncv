@@ -62,6 +62,6 @@ describe("FileUpload Accessibility", () => {
 
     await user.hover(deleteButton);
     const tooltip = await screen.findByRole("tooltip");
-    expect(tooltip).toHaveTextContent("Delete saved CV");
+    expect(tooltip).toHaveTextContent("Delete My CV");
   });
 });
