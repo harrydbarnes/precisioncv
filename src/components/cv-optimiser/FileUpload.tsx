@@ -208,7 +208,7 @@ const FileUpload = ({
                         </Button>
                       </TooltipTrigger>
                       <TooltipContent>
-                        <p>Delete saved CV</p>
+                        <p>Delete {cv.name}</p>
                       </TooltipContent>
                     </Tooltip>
                   </DropdownMenuItem>
