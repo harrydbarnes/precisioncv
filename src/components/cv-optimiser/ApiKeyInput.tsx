@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, memo } from "react";
 import { motion } from "framer-motion";
 import { Eye, EyeOff, Key, Info } from "lucide-react";
 import { Input } from "@/components/ui/input";
@@ -93,4 +93,4 @@ const ApiKeyInput = ({ value, onChange, saveKey, onSaveKeyChange }: ApiKeyInputP
   );
 };
 
-export default ApiKeyInput;
+export default memo(ApiKeyInput);

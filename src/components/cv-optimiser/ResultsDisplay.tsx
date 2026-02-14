@@ -1,3 +1,4 @@
+import { memo } from "react";
 import { FileText, Mail, MessageSquare, TrendingUp, Target } from "lucide-react";
 import OutputCard from "./OutputCard";
 import type { GeminiResponse } from "@/lib/gemini-api";
@@ -103,4 +104,4 @@ const ResultsDisplay = ({ data }: ResultsDisplayProps) => {
   );
 };
 
-export default ResultsDisplay;
+export default memo(ResultsDisplay);
