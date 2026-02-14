@@ -18,15 +18,26 @@
     <meta name="twitter:card" content="summary_large_image" />
 
     <!-- pdf.js for client-side PDF text extraction -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js" integrity="sha384-/1qUCSGwTur9vjf/z9lmu/eCUYbpOTgSjmpbMQZ1/CtX2v/WcAIKqRv+U1DUCG6e" crossorigin="anonymous"></script>
     <script>
-      if (window.pdfjsLib) {
-        window.pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-      }
+      (async () => {
+        if (window.pdfjsLib) {
+          try {
+            const workerUrl = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+            const integrity = 'sha384-4a/L2hmJq3X3bB2s2v+i2L/h2Gg7p/1e/0I/JzcU8CR2bOaUoX/o3e3';
+            const response = await fetch(workerUrl, { integrity });
+            if (!response.ok) throw new Error(`Failed to fetch worker: ${response.status}`);
+            const blob = await response.blob();
+            window.pdfjsLib.GlobalWorkerOptions.workerSrc = URL.createObjectURL(blob);
+          } catch (error) {
+            console.error('Failed to set up PDF.js worker with SRI:', error);
+          }
+        }
+      })();
     </script>
 
     <!-- mammoth.js for client-side DOCX text extraction -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js" integrity="sha384-nFoSjZIoH3CCp8W639jJyQkuPHinJ2NHe7on1xvlUA7SuGfJAfvMldrsoAVm6ECz" crossorigin="anonymous"></script>
 
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
