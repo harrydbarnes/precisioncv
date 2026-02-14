@@ -37,8 +37,11 @@ const isQnaArray = (
 ): value is Array<{ question: string; answer: string }> =>
   Array.isArray(value) &&
   value.every(
-    (item: any) =>
-      item && typeof item.question === "string" && typeof item.answer === "string"
+    (item: unknown) =>
+      typeof item === "object" &&
+      item !== null &&
+      typeof (item as Record<string, unknown>).question === "string" &&
+      typeof (item as Record<string, unknown>).answer === "string"
   );
 
 export async function callGeminiApi(
