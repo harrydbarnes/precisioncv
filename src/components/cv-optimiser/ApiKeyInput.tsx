@@ -38,7 +38,13 @@ const ApiKeyInput = ({ value, onChange, saveKey, onSaveKeyChange }: ApiKeyInputP
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
-                <Info className="h-4 w-4 cursor-pointer text-muted-foreground hover:text-primary transition-colors" />
+                <button
+                  type="button"
+                  className="cursor-pointer rounded-full text-muted-foreground transition-colors hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+                  aria-label="Where to find your API key"
+                >
+                  <Info className="h-4 w-4" />
+                </button>
               </TooltipTrigger>
               <TooltipContent>
                 <p>
