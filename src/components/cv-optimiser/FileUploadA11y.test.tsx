@@ -38,7 +38,7 @@ describe("FileUpload Accessibility", () => {
   it("should have accessible dropdown trigger and delete button, and show tooltip on hover", async () => {
     const user = userEvent.setup();
     const savedCVs = [
-      { name: "saved CV", content: "test", date: 123 },
+      { name: "My CV", content: "test", date: 123 },
     ];
 
     render(
