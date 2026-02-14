@@ -3,14 +3,14 @@ import { motion } from "framer-motion";
 import { Info } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Button } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
 import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { TailorStyle } from "@/lib/gemini-api";
+import { cn } from "@/lib/utils";
 
 interface TailorSectionProps {
   keywords: string;
@@ -66,32 +66,47 @@ const TailorSection = ({ keywords, setKeywords, selectedStyles, setSelectedStyle
       <div className="space-y-3">
         <Label className="text-sm font-semibold">Update Style</Label>
         <div className="flex flex-wrap gap-3">
-          <TooltipProvider>
-            {styles.map((s) => {
-              const isSelected = selectedStyles.includes(s.id);
-              return (
-                <Tooltip key={s.id}>
-                  <TooltipTrigger asChild>
-                    <Button
-                      variant={isSelected ? "default" : "outline"}
-                      onClick={() => toggleStyle(s.id)}
-                      className={`gap-2 transition-all duration-200 ${
-                        isSelected
-                          ? "bg-hero-500 text-hero-800 hover:bg-hero-600 border-hero-500 ring-2 ring-hero-500 ring-offset-2"
-                          : "hover:bg-hero-100/50 hover:text-hero-800 hover:border-hero-500"
-                      }`}
+          {styles.map((s) => {
+            const isSelected = selectedStyles.includes(s.id);
+            return (
+              <div
+                key={s.id}
+                data-testid={`style-option-${s.id}`}
+                className={cn(
+                  buttonVariants({ variant: isSelected ? "default" : "outline" }),
+                  "gap-0 p-0 overflow-hidden transition-all duration-200",
+                  isSelected
+                    ? "bg-hero-500 text-hero-800 hover:bg-hero-600 border-hero-500 ring-2 ring-hero-500 ring-offset-2"
+                    : "hover:bg-hero-100/50 hover:text-hero-800 hover:border-hero-500"
+                )}
+              >
+                <button
+                  type="button"
+                  onClick={() => toggleStyle(s.id)}
+                  className="px-4 py-2 h-full flex items-center justify-center font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-ring"
+                >
+                  {s.label}
+                </button>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <button
+                      type="button"
+                      className={cn(
+                        "px-3 py-2 h-full flex items-center justify-center border-l transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-ring",
+                        isSelected ? "border-hero-800/20 hover:bg-hero-800/10" : "border-input hover:bg-accent"
+                      )}
+                      aria-label={`${s.label} description`}
                     >
-                      {s.label}
-                      <Info className="h-4 w-4 opacity-50" />
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>
+                      <Info className="h-4 w-4 opacity-70" />
+                    </button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-64 p-3 text-sm">
                     <p>{s.description}</p>
-                  </TooltipContent>
-                </Tooltip>
-              );
-            })}
-          </TooltipProvider>
+                  </PopoverContent>
+                </Popover>
+              </div>
+            );
+          })}
         </div>
       </div>
     </motion.div>

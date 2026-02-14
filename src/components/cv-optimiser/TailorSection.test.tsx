@@ -25,20 +25,17 @@ describe("TailorSection", () => {
       />
     );
 
-    // Find the 'Precision' button
-    const precisionButton = screen.getByText("Precision").closest("button");
-    const ruthlessButton = screen.getByText("Ruthless").closest("button");
+    // Find the containers by data-testid
+    const precisionContainer = screen.getByTestId("style-option-Precision");
+    const ruthlessContainer = screen.getByTestId("style-option-Ruthless");
 
-    expect(precisionButton).toBeInTheDocument();
-    expect(ruthlessButton).toBeInTheDocument();
+    expect(precisionContainer).toBeInTheDocument();
+    expect(ruthlessContainer).toBeInTheDocument();
 
-    // The selected button (Precision) SHOULD have the prominent style (bg-hero-500)
-    // Currently (bugged), it does NOT have it.
-    // So this assertion is expected to FAIL until the bug is fixed.
-    expect(precisionButton).toHaveClass("bg-hero-500");
+    // The selected container (Precision) SHOULD have the prominent style (bg-hero-500)
+    expect(precisionContainer).toHaveClass("bg-hero-500");
 
-    // The unselected button (Ruthless) SHOULD NOT have the prominent style
-    // Currently (bugged), it HAS it.
-    expect(ruthlessButton).not.toHaveClass("bg-hero-500");
+    // The unselected container (Ruthless) SHOULD NOT have the prominent style
+    expect(ruthlessContainer).not.toHaveClass("bg-hero-500");
   });
 });
