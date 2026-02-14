@@ -14,7 +14,7 @@ global.ResizeObserver = vi.fn().mockImplementation(() => ({
 }));
 
 describe("FileUpload Accessibility", () => {
-  it("should have accessible clear button when file is selected", async () => {
+  it("should have accessible clear button and show tooltip on hover", async () => {
     const user = userEvent.setup();
     render(
       <TooltipProvider>
@@ -35,10 +35,10 @@ describe("FileUpload Accessibility", () => {
     expect(tooltip).toHaveTextContent("Remove file");
   });
 
-  it("should have accessible dropdown trigger and delete button for saved CVs", async () => {
+  it("should have accessible dropdown trigger and delete button, and show tooltip on hover", async () => {
     const user = userEvent.setup();
     const savedCVs = [
-      { name: "My CV", content: "test", date: 123 },
+      { name: "saved CV", content: "test", date: 123 },
     ];
 
     render(
@@ -57,11 +57,11 @@ describe("FileUpload Accessibility", () => {
 
     await user.click(dropdownTrigger);
 
-    const deleteButton = screen.getByLabelText("Delete My CV");
+    const deleteButton = screen.getByLabelText("Delete saved CV");
     expect(deleteButton).toBeInTheDocument();
 
     await user.hover(deleteButton);
     const tooltip = await screen.findByRole("tooltip");
-    expect(tooltip).toHaveTextContent("Delete My CV");
+    expect(tooltip).toHaveTextContent("Delete saved CV");
   });
 });
