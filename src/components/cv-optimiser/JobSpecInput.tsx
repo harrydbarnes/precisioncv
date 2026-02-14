@@ -1,4 +1,4 @@
-import { useState, memo } from "react";
+import { useState, memo, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Briefcase, Globe, Loader2 } from "lucide-react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
@@ -33,7 +33,7 @@ const JobSpecInput = ({ value, onChange, onError }: JobSpecInputProps) => {
   const [url, setUrl] = useState("");
   const [fetchingUrl, setFetchingUrl] = useState(false);
 
-  const handleUrlFetch = async () => {
+  const handleUrlFetch = useCallback(async () => {
     setFetchingUrl(true);
     try {
       const text = await extractTextFromUrl(url);
@@ -44,7 +44,11 @@ const JobSpecInput = ({ value, onChange, onError }: JobSpecInputProps) => {
     } finally {
       setFetchingUrl(false);
     }
-  };
+  }, [url, onChange, onError]);
+
+  const handleTextChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    onChange(e.target.value);
+  }, [onChange]);
 
   return (
     <motion.div {...containerAnimation}>
@@ -81,7 +85,7 @@ const JobSpecInput = ({ value, onChange, onError }: JobSpecInputProps) => {
               <Textarea
                 placeholder="Paste the job specification here..."
                 value={value}
-                onChange={(e) => onChange(e.target.value)}
+                onChange={handleTextChange}
                 className="min-h-[160px] transition-all duration-200 focus:neon-glow"
               />
             </motion.div>
