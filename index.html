@@ -3,6 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https://generativelanguage.googleapis.com https://api.allorigins.win https://cdnjs.cloudflare.com; worker-src 'self' blob:; object-src 'none'; base-uri 'self';" />
     <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png" />
     <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png" />
     <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png" />
@@ -24,7 +25,7 @@
         if (window.pdfjsLib) {
           try {
             const workerUrl = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-            const integrity = 'sha384-4a/L2hmJq3X3bB2s2v+i2L/h2Gg7p/1e/0I/JzcU8CR2bOaUoX/o3e3';
+            const integrity = 'sha384-SnzOobpRMLXZ52iJvZm/C0fYw0OQemTXzTjIsdsfMcrCtCEe9qgzxTd3RSklO5x2';
             const response = await fetch(workerUrl, { integrity });
             if (!response.ok) throw new Error(`Failed to fetch worker: ${response.status}`);
             const blob = await response.blob();
