@@ -1,3 +1,4 @@
+import { memo } from "react";
 import { motion } from "framer-motion";
 import { Sparkles } from "lucide-react";
 
@@ -46,4 +47,4 @@ const Header = () => {
   );
 };
 
-export default Header;
+export default memo(Header);
