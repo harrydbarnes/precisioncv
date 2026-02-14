@@ -57,7 +57,7 @@ describe("FileUpload Accessibility", () => {
 
     await user.click(dropdownTrigger);
 
-    const deleteButton = screen.getByLabelText("Delete saved CV");
+    const deleteButton = screen.getByLabelText("Delete My CV");
     expect(deleteButton).toBeInTheDocument();
 
     await user.hover(deleteButton);
