@@ -100,7 +100,7 @@ const TailorSection = ({ keywords, setKeywords, selectedStyles, setSelectedStyle
                       <Info className="h-4 w-4 opacity-70" />
                     </button>
                   </PopoverTrigger>
-                  <PopoverContent className="w-64 p-3 text-sm">
+                  <PopoverContent className="w-64 p-3 text-sm bg-tooltip-blue border-tooltip-blue text-white shadow-none">
                     <p>{s.description}</p>
                   </PopoverContent>
                 </Popover>

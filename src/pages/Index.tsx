@@ -255,7 +255,7 @@ const Index = () => {
                     </Button>
                   </div>
                 </PopoverTrigger>
-                <PopoverContent className="bg-destructive-tooltip border-destructive-tooltip text-white w-auto p-2">
+                <PopoverContent className="bg-destructive-tooltip border-destructive-tooltip text-white w-auto p-2 shadow-none">
                   <p>Please provide: {missingRequirements.join(", ")}</p>
                 </PopoverContent>
               </Popover>
