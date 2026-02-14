@@ -14,7 +14,8 @@ global.ResizeObserver = vi.fn().mockImplementation(() => ({
 }));
 
 describe("FileUpload Accessibility", () => {
-  it("should have accessible clear button when file is selected", async () => {
+  it("should have accessible clear button and show tooltip on hover", async () => {
+    const user = userEvent.setup();
     render(
       <TooltipProvider>
         <FileUpload
@@ -29,11 +30,12 @@ describe("FileUpload Accessibility", () => {
     const clearButton = screen.getByLabelText("Remove file");
     expect(clearButton).toBeInTheDocument();
 
-    // Check if tooltip content is present in the DOM (might be hidden)
-    // Radix tooltip content is usually not in DOM until triggered.
+    await user.hover(clearButton);
+    const tooltip = await screen.findByRole("tooltip");
+    expect(tooltip).toHaveTextContent("Remove file");
   });
 
-  it("should have accessible dropdown trigger and delete button for saved CVs", async () => {
+  it("should have accessible dropdown trigger and delete button, and show tooltip on hover", async () => {
     const user = userEvent.setup();
     const savedCVs = [
       { name: "My CV", content: "test", date: 123 },
@@ -57,5 +59,9 @@ describe("FileUpload Accessibility", () => {
 
     const deleteButton = screen.getByLabelText("Delete My CV");
     expect(deleteButton).toBeInTheDocument();
+
+    await user.hover(deleteButton);
+    const tooltip = await screen.findByRole("tooltip");
+    expect(tooltip).toHaveTextContent("Delete My CV");
   });
 });
