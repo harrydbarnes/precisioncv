@@ -92,8 +92,8 @@ const TailorSection = ({ keywords, setKeywords, selectedStyles, setSelectedStyle
                     <button
                       type="button"
                       className={cn(
-                        "px-3 py-2 h-full flex items-center justify-center border-l transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-ring",
-                        isSelected ? "border-hero-800/20 hover:bg-hero-800/10" : "border-input hover:bg-accent"
+                        "px-3 py-2 h-full flex items-center justify-center transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-ring",
+                        isSelected ? "hover:bg-hero-800/10" : "hover:bg-accent"
                       )}
                       aria-label={`${s.label} description`}
                     >
