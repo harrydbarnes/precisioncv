@@ -20,6 +20,11 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { extractTextFromFile } from "@/lib/extract-text";
 
 export interface SavedCV {
@@ -146,9 +151,22 @@ const FileUpload = ({
           )}
           <span className="flex-1 truncate text-sm font-medium">{fileName}</span>
           {!extracting && (
-            <Button variant="ghost" size="icon" className="h-7 w-7" onClick={clear}>
-              <X className="h-4 w-4" />
-            </Button>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-7 w-7"
+                  onClick={clear}
+                  aria-label="Remove file"
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Remove file</p>
+              </TooltipContent>
+            </Tooltip>
           )}
         </motion.div>
       ) : (
@@ -156,7 +174,11 @@ const FileUpload = ({
           {savedCVs.length > 0 && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="outline" className="w-full justify-between font-normal">
+                <Button
+                  variant="outline"
+                  className="w-full justify-between font-normal"
+                  aria-label="Select saved CV"
+                >
                   <span className="truncate">Select a saved CV</span>
                   <ChevronDown className="ml-2 h-4 w-4 opacity-50" />
                 </Button>
@@ -169,18 +191,26 @@ const FileUpload = ({
                     onSelect={() => handleSelectCV(cv.name)}
                   >
                     <span className="truncate pr-8">{cv.name}</span>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-6 w-6 hover:bg-destructive/10 hover:text-destructive shrink-0"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        setDeleteId(cv.name);
-                      }}
-                    >
-                      <Trash2 className="h-3 w-3" />
-                    </Button>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-6 w-6 hover:bg-destructive/10 hover:text-destructive shrink-0"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            setDeleteId(cv.name);
+                          }}
+                          aria-label={`Delete ${cv.name}`}
+                        >
+                          <Trash2 className="h-3 w-3" />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Delete saved CV</p>
+                      </TooltipContent>
+                    </Tooltip>
                   </DropdownMenuItem>
                 ))}
               </DropdownMenuContent>
