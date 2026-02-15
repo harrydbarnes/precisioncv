@@ -14,13 +14,13 @@ describe("TailorSection", () => {
   it("renders with correct selected styles", () => {
     const setKeywords = vi.fn();
     const setSelectedStyles = vi.fn();
-    const selectedStyles = ["Precision"]; // 'Precision' is selected
+    const selectedStyles: any = ["Precision"]; // 'Precision' is selected
 
     render(
       <TailorSection
         keywords=""
         setKeywords={setKeywords}
-        selectedStyles={selectedStyles as any}
+        selectedStyles={selectedStyles}
         setSelectedStyles={setSelectedStyles}
       />
     );
