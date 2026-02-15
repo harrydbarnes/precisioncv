@@ -161,8 +161,6 @@ const Index = () => {
   if (!cvText.trim()) missingRequirements.push("CV Upload");
   if (!jobSpecText.trim()) missingRequirements.push("Job Specification");
 
-  const canGenerate = missingRequirements.length === 0 && !loading;
-
   return (
     <div className="min-h-screen bg-background">
       <Header />
@@ -221,45 +219,46 @@ const Index = () => {
 
           {/* Generate button */}
           <div className="w-full">
-            {canGenerate ? (
-              <Button
-                onClick={handleGenerate}
-                disabled={false}
-                size="lg"
-                className="w-full gap-2 text-base font-semibold bg-hero-500 text-hero-800 transition-all duration-300 hover:bg-hero-600 disabled:opacity-50 disabled:pointer-events-none"
-              >
-                {loading ? (
-                  <>
-                    <Loader2 className="h-5 w-5 animate-spin" />
-                    Generating...
-                  </>
-                ) : (
-                  <>
-                    <Zap className="h-5 w-5" />
-                    Generate
-                  </>
-                )}
-              </Button>
-            ) : (
-              <Popover>
-                <PopoverTrigger asChild>
-                  <div className="w-full cursor-not-allowed">
-                    <Button
-                      onClick={handleGenerate}
-                      disabled={true}
-                      size="lg"
-                      className="w-full gap-2 text-base font-semibold bg-hero-500 text-hero-800 transition-all duration-300 hover:bg-hero-600 disabled:opacity-50 disabled:pointer-events-none"
-                    >
+            {(() => {
+              const isDisabled = missingRequirements.length > 0 || loading;
+              const showPopover = missingRequirements.length > 0 && !loading;
+
+              const button = (
+                <Button
+                  onClick={handleGenerate}
+                  disabled={isDisabled}
+                  size="lg"
+                  className="w-full gap-2 text-base font-semibold bg-hero-500 text-hero-800 transition-all duration-300 hover:bg-hero-600 disabled:opacity-50 disabled:pointer-events-none"
+                >
+                  {loading ? (
+                    <>
+                      <Loader2 className="h-5 w-5 animate-spin" />
+                      Generating...
+                    </>
+                  ) : (
+                    <>
                       <Zap className="h-5 w-5" />
                       Generate
-                    </Button>
-                  </div>
-                </PopoverTrigger>
-                <PopoverContent className="bg-destructive-tooltip border-destructive-tooltip text-white w-auto p-2 shadow-none">
-                  <p>Please provide: {missingRequirements.join(", ")}</p>
-                </PopoverContent>
-              </Popover>
-            )}
+                    </>
+                  )}
+                </Button>
+              );
+
+              if (showPopover) {
+                return (
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <div className="w-full cursor-not-allowed">{button}</div>
+                    </PopoverTrigger>
+                    <PopoverContent className="bg-destructive-tooltip border-destructive-tooltip text-white w-auto p-2 shadow-none">
+                      <p>Please provide: {missingRequirements.join(", ")}</p>
+                    </PopoverContent>
+                  </Popover>
+                );
+              }
+
+              return button;
+            })()}
           </div>
         </motion.section>
 
