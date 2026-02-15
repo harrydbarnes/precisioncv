@@ -5,8 +5,18 @@ const LoadingSkeleton = () => {
   // Create an array of 4 items to simulate the output sections
   const items = [1, 2, 3, 4];
 
+  // Oat skeleton CSS relies on --muted and --radius-medium.
+  // Our project defines --muted as HSL components (e.g. "72 100% 42%"), not a full color.
+  // We need to shim these variables to make the library styles work correctly.
+  const skeletonStyles = {
+    "--muted": "hsl(72 100% 42%)",
+    "--foreground": "hsl(72 100% 8%)",
+    "--radius-medium": "0.5rem",
+    "--space-3": "0.75rem",
+  } as React.CSSProperties;
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-6" style={skeletonStyles}>
       {items.map((_, i) => (
         <motion.div
           key={i}
@@ -16,10 +26,10 @@ const LoadingSkeleton = () => {
         >
           {/* Oat-style Skeleton: Box + Lines structure */}
           <div className="flex gap-4 p-4 border rounded-lg bg-card shadow-sm">
-            <div className="h-12 w-12 bg-primary/20 rounded animate-pulse shrink-0" /> {/* Skeleton Box */}
+            <div role="status" className="skeleton box" />
             <div className="flex-1 space-y-3 py-1">
-              <div className="h-4 bg-primary/20 rounded w-3/4 animate-pulse" /> {/* Skeleton Line */}
-              <div className="h-4 bg-primary/20 rounded w-1/2 animate-pulse" /> {/* Skeleton Line */}
+              <div role="status" className="skeleton line" style={{ width: "75%" }} />
+              <div role="status" className="skeleton line" style={{ width: "50%" }} />
             </div>
           </div>
         </motion.div>

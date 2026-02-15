@@ -1,3 +1,5 @@
+@import "@knadh/oat/css/skeleton.css";
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
