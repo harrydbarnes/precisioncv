@@ -14,11 +14,10 @@ import { callGeminiApi, type GeminiResponse, type TailorStyle } from "@/lib/gemi
 import { useToast } from "@/hooks/use-toast";
 import { useDebounce } from "@/hooks/use-debounce";
 import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 
 const Index = () => {
   const [apiKey, setApiKey] = useState(() => sessionStorage.getItem("gemini-key") || "");
@@ -221,37 +220,47 @@ const Index = () => {
           </AnimatePresence>
 
           {/* Generate button */}
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <div className="w-full cursor-not-allowed">
-                  <Button
-                    onClick={handleGenerate}
-                    disabled={!canGenerate}
-                    size="lg"
-                    className="w-full gap-2 text-base font-semibold bg-hero-500 text-hero-800 transition-all duration-300 hover:bg-hero-600 disabled:opacity-50 disabled:pointer-events-none"
-                  >
-                    {loading ? (
-                      <>
-                        <Loader2 className="h-5 w-5 animate-spin" />
-                        Generating...
-                      </>
-                    ) : (
-                      <>
-                        <Zap className="h-5 w-5" />
-                        Generate
-                      </>
-                    )}
-                  </Button>
-                </div>
-              </TooltipTrigger>
-              {!canGenerate && (
-                <TooltipContent className="bg-destructive-tooltip border-destructive-tooltip text-white">
+          <div className="w-full">
+            {canGenerate ? (
+              <Button
+                onClick={handleGenerate}
+                disabled={false}
+                size="lg"
+                className="w-full gap-2 text-base font-semibold bg-hero-500 text-hero-800 transition-all duration-300 hover:bg-hero-600 disabled:opacity-50 disabled:pointer-events-none"
+              >
+                {loading ? (
+                  <>
+                    <Loader2 className="h-5 w-5 animate-spin" />
+                    Generating...
+                  </>
+                ) : (
+                  <>
+                    <Zap className="h-5 w-5" />
+                    Generate
+                  </>
+                )}
+              </Button>
+            ) : (
+              <Popover>
+                <PopoverTrigger asChild>
+                  <div className="w-full cursor-not-allowed">
+                    <Button
+                      onClick={handleGenerate}
+                      disabled={true}
+                      size="lg"
+                      className="w-full gap-2 text-base font-semibold bg-hero-500 text-hero-800 transition-all duration-300 hover:bg-hero-600 disabled:opacity-50 disabled:pointer-events-none"
+                    >
+                      <Zap className="h-5 w-5" />
+                      Generate
+                    </Button>
+                  </div>
+                </PopoverTrigger>
+                <PopoverContent className="bg-destructive-tooltip border-destructive-tooltip text-white w-auto p-2 shadow-none">
                   <p>Please provide: {missingRequirements.join(", ")}</p>
-                </TooltipContent>
-              )}
-            </Tooltip>
-          </TooltipProvider>
+                </PopoverContent>
+              </Popover>
+            )}
+          </div>
         </motion.section>
 
         {/* Output section */}

@@ -20,7 +20,7 @@ const Footer = () => {
               Open Sources
             </Button>
           </DialogTrigger>
-          <DialogContent>
+          <DialogContent className="w-[90%] rounded-2xl sm:w-full">
             <DialogHeader>
               <DialogTitle>Open Source Credits</DialogTitle>
               <DialogDescription>
