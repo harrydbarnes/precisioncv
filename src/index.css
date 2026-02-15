@@ -56,6 +56,10 @@
     --surface-elevated: 72 100% 42%;
     --gradient-start: 72 100% 50%;
     --gradient-end: 72 100% 25%;
+
+    /* Color shims for external libraries (Oat) */
+    --muted-color: hsl(var(--muted));
+    --foreground-color: hsl(var(--foreground));
   }
 
   .dark {
@@ -102,6 +106,10 @@
     --surface-elevated: 72 100% 17%;
     --gradient-start: 72 100% 50%;
     --gradient-end: 72 100% 25%;
+
+    /* Color shims for external libraries (Oat) */
+    --muted-color: hsl(var(--muted));
+    --foreground-color: hsl(var(--foreground));
   }
 }
 

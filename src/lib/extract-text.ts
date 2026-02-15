@@ -10,6 +10,16 @@ declare global {
   }
 }
 
+/**
+ * CORS Proxy URL for fetching external content.
+ * WARNING: This uses a public proxy service (CodeTabs).
+ * This exposes the requested URL and potentially the content to the third-party service.
+ * It is used here for demonstration/client-side-only purposes.
+ *
+ * SECURITY: In a production environment, this should be replaced with a secure,
+ * self-hosted backend proxy to prevent SSRF risks and ensure data privacy.
+ * Do NOT use this with sensitive internal URLs or PII.
+ */
 const CORS_PROXY_URL = "https://api.codetabs.com/v1/proxy?quest=";
 
 /** Extract text from a PDF file using pdf.js */

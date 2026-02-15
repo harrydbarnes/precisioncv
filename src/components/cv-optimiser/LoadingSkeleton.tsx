@@ -1,35 +1,23 @@
 import { motion } from "framer-motion";
-import { useTheme } from "next-themes";
 
 /** Animated loading skeleton displayed while the API call is in progress */
 const LoadingSkeleton = () => {
   // Create an array of 4 items to simulate the output sections
   const items = [1, 2, 3, 4];
-  const { theme, systemTheme } = useTheme();
-
-  // Determine if dark mode is active
-  const isDark = theme === "dark" || (theme === "system" && systemTheme === "dark");
 
   // Oat skeleton CSS relies on --muted and --radius-medium.
   // Our project defines --muted as HSL components, not a full color.
   // We need to shim these variables to make the library styles work correctly.
-  // Values taken from src/index.css
-  const lightStyles = {
-    "--muted": "hsl(72 100% 42%)",
-    "--foreground": "hsl(72 100% 8%)",
-    "--radius-medium": "0.5rem",
-    "--space-3": "0.75rem",
-  } as React.CSSProperties;
-
-  const darkStyles = {
-    "--muted": "hsl(72 100% 17%)",
-    "--foreground": "hsl(72 100% 50%)",
+  // These variables are defined in src/index.css and automatically switch with the theme.
+  const skeletonStyles = {
+    "--muted": "var(--muted-color)",
+    "--foreground": "var(--foreground-color)",
     "--radius-medium": "0.5rem",
     "--space-3": "0.75rem",
   } as React.CSSProperties;
 
   return (
-    <div className="space-y-6" style={isDark ? darkStyles : lightStyles}>
+    <div className="space-y-6" style={skeletonStyles}>
       {items.map((_, i) => (
         <motion.div
           key={i}
