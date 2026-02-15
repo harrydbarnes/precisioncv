@@ -43,7 +43,7 @@ const GenerateButton = ({ loading, missingRequirements, onGenerate }: GenerateBu
         <PopoverTrigger asChild>
           <div className="w-full cursor-not-allowed">{button}</div>
         </PopoverTrigger>
-        <PopoverContent className="bg-destructive-tooltip border-destructive-tooltip text-white w-auto p-2 shadow-none">
+        <PopoverContent className="bg-destructive-tooltip border-destructive-tooltip text-white w-auto max-w-[calc(100vw-2rem)] p-2 shadow-none break-words">
           <p>Please provide: {missingRequirements.join(", ")}</p>
         </PopoverContent>
       </Popover>
