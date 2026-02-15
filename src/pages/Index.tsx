@@ -1,7 +1,6 @@
 import { useState, useCallback, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Loader2, Zap, AlertCircle } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { AlertCircle } from "lucide-react";
 import Header from "@/components/cv-optimiser/Header";
 import ApiKeyInput from "@/components/cv-optimiser/ApiKeyInput";
 import FileUpload, { type SavedCV } from "@/components/cv-optimiser/FileUpload";
@@ -9,15 +8,11 @@ import JobSpecInput from "@/components/cv-optimiser/JobSpecInput";
 import LoadingSkeleton from "@/components/cv-optimiser/LoadingSkeleton";
 import ResultsDisplay from "@/components/cv-optimiser/ResultsDisplay";
 import TailorSection from "@/components/cv-optimiser/TailorSection";
+import GenerateButton from "@/components/cv-optimiser/GenerateButton";
 import Footer from "@/components/Footer";
 import { callGeminiApi, type GeminiResponse, type TailorStyle } from "@/lib/gemini-api";
 import { useToast } from "@/hooks/use-toast";
 import { useDebounce } from "@/hooks/use-debounce";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
 
 const Index = () => {
   const [apiKey, setApiKey] = useState(() => sessionStorage.getItem("gemini-key") || "");
@@ -219,46 +214,11 @@ const Index = () => {
 
           {/* Generate button */}
           <div className="w-full">
-            {(() => {
-              const isDisabled = missingRequirements.length > 0 || loading;
-              const showPopover = missingRequirements.length > 0 && !loading;
-
-              const button = (
-                <Button
-                  onClick={handleGenerate}
-                  disabled={isDisabled}
-                  size="lg"
-                  className="w-full gap-2 text-base font-semibold bg-hero-500 text-hero-800 transition-all duration-300 hover:bg-hero-600 disabled:opacity-50 disabled:pointer-events-none"
-                >
-                  {loading ? (
-                    <>
-                      <Loader2 className="h-5 w-5 animate-spin" />
-                      Generating...
-                    </>
-                  ) : (
-                    <>
-                      <Zap className="h-5 w-5" />
-                      Generate
-                    </>
-                  )}
-                </Button>
-              );
-
-              if (showPopover) {
-                return (
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <div className="w-full cursor-not-allowed">{button}</div>
-                    </PopoverTrigger>
-                    <PopoverContent className="bg-destructive-tooltip border-destructive-tooltip text-white w-auto p-2 shadow-none">
-                      <p>Please provide: {missingRequirements.join(", ")}</p>
-                    </PopoverContent>
-                  </Popover>
-                );
-              }
-
-              return button;
-            })()}
+            <GenerateButton
+              loading={loading}
+              missingRequirements={missingRequirements}
+              onGenerate={handleGenerate}
+            />
           </div>
         </motion.section>
 
