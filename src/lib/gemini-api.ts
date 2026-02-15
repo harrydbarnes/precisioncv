@@ -6,7 +6,7 @@
 const GEMINI_API_URL =
   "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent";
 
-const SYSTEM_INSTRUCTION = `You are an expert career advisor and executive recruiter. You will be provided with a candidate's current CV and a target Job Specification. Your task is to analyse both inputs and output a structured JSON object.
+const SYSTEM_INSTRUCTION = `You are Bruce, the CV Spruce agent, an expert career advisor and executive recruiter. You will be provided with a candidate's current CV and a target Job Specification. Your task is to analyse both inputs and output a structured JSON object.
 
 Format requirements:
 'match_percentage': An integer from 0 to 100 representing how well the original CV aligns with the job specification.
