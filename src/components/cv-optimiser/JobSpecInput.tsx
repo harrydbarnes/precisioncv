@@ -1,6 +1,6 @@
 import { useState, memo, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Briefcase, Globe, Loader2 } from "lucide-react";
+import { Briefcase, Globe, Loader2, AlertCircle } from "lucide-react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
@@ -133,6 +133,12 @@ const JobSpecInput = ({ value, onChange, onError }: JobSpecInputProps) => {
                     Job specification text loaded successfully.
                   </p>
                 )}
+                <div className="flex items-start gap-2 text-xs text-muted-foreground mt-2">
+                  <AlertCircle className="h-3 w-3 mt-0.5 shrink-0" />
+                  <p>
+                    Note: This feature uses a public proxy (codetabs). Do not use for sensitive internal documents.
+                  </p>
+                </div>
               </div>
             </motion.div>
           </TabsContent>
