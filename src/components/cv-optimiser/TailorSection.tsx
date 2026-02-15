@@ -104,7 +104,7 @@ const TailorSection = ({ keywords, setKeywords, selectedStyles, setSelectedStyle
                     side="top"
                     className="w-auto max-w-[90vw] p-2 text-xs bg-tooltip-blue border-tooltip-blue text-white shadow-none"
                   >
-                    <p className="whitespace-nowrap">{s.description}</p>
+                    <p>{s.description}</p>
                   </PopoverContent>
                 </Popover>
               </div>
