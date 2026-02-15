@@ -30,7 +30,7 @@ const Header = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
         >
-          <span className="text-hero-900">Precision CV</span>
+          <span className="text-hero-900">CV Spruce</span>
         </motion.h1>
 
         <motion.p
@@ -39,7 +39,7 @@ const Header = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
         >
-          Upload your CV and a job specification to receive a tailored CV, cover letter,
+          Meet Bruce, the CV Spruce agent. Upload your CV and a job specification to receive a tailored CV, cover letter,
           interview preparation, and industry insights, all generated in seconds.
         </motion.p>
       </div>
