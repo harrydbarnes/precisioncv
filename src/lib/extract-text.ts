@@ -80,7 +80,7 @@ export async function extractTextFromUrl(url: string): Promise<string> {
     throw new Error("The URL you entered is not valid. Please check and try again.");
   }
 
-  const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`;
+  const proxyUrl = `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(url)}`;
 
   const response = await fetch(proxyUrl);
   if (!response.ok) {

@@ -1,6 +1,6 @@
 import { useState, memo } from "react";
 import { motion } from "framer-motion";
-import { Eye, EyeOff, Key, Info } from "lucide-react";
+import { Eye, EyeOff, Key, Info, Check } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
@@ -60,6 +60,16 @@ const ApiKeyInput = ({ value, onChange, saveKey, onSaveKeyChange }: ApiKeyInputP
           </Popover>
         </div>
         <div className="flex items-center gap-2">
+          {saveKey && (
+            <motion.span
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="text-xs text-green-500 flex items-center gap-1 font-medium"
+            >
+              <Check className="h-3 w-3" />
+              Saved
+            </motion.span>
+          )}
           <Label htmlFor="save-key" className="text-xs cursor-pointer">Save API Key</Label>
           <Switch
             id="save-key"
