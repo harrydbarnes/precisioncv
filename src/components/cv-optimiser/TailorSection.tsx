@@ -74,7 +74,7 @@ const TabSelector = ({
 }: {
   options: { id: string; label: string }[];
   value: string;
-  onChange: (value: any) => void;
+  onChange: (value: string) => void;
   disabled?: boolean;
   layoutId: string;
 }) => {
