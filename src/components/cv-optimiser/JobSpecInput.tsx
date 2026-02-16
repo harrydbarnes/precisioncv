@@ -1,11 +1,12 @@
 import { useState, memo, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Briefcase, Globe, Loader2, AlertCircle } from "lucide-react";
+import { Briefcase, Globe, Loader2, AlertCircle, X } from "lucide-react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
 import FileUpload from "./FileUpload";
 import { extractTextFromUrl } from "@/lib/extract-text";
 
@@ -13,6 +14,8 @@ interface JobSpecInputProps {
   value: string;
   onChange: (value: string) => void;
   onError: (error: string) => void;
+  rememberJobSpec?: boolean;
+  onRememberChange?: (checked: boolean) => void;
 }
 
 const containerAnimation = {
@@ -29,7 +32,13 @@ const tabContentAnimation = {
 };
 
 /** Tabbed job specification input: text, file, or URL */
-const JobSpecInput = ({ value, onChange, onError }: JobSpecInputProps) => {
+const JobSpecInput = ({
+  value,
+  onChange,
+  onError,
+  rememberJobSpec,
+  onRememberChange,
+}: JobSpecInputProps) => {
   const [url, setUrl] = useState("");
   const [fetchingUrl, setFetchingUrl] = useState(false);
 
@@ -50,12 +59,33 @@ const JobSpecInput = ({ value, onChange, onError }: JobSpecInputProps) => {
     onChange(e.target.value);
   }, [onChange]);
 
+  const handleClear = useCallback(() => {
+    onChange("");
+  }, [onChange]);
+
   return (
     <motion.div {...containerAnimation}>
-      <Label className="mb-2 flex items-center gap-2 text-sm font-semibold">
-        <Briefcase className="h-4 w-4 text-primary" />
-        Job Specification
-      </Label>
+      <div className="mb-2 flex items-center justify-between">
+        <Label className="flex items-center gap-2 text-sm font-semibold">
+          <Briefcase className="h-4 w-4 text-primary" />
+          Job Specification
+        </Label>
+        {onRememberChange && (
+          <div className="flex items-center gap-2">
+            <Checkbox
+              id="remember-job-spec"
+              checked={rememberJobSpec}
+              onCheckedChange={(checked) => onRememberChange(checked as boolean)}
+            />
+            <label
+              htmlFor="remember-job-spec"
+              className="text-xs text-muted-foreground cursor-pointer select-none"
+            >
+              Remember
+            </label>
+          </div>
+        )}
+      </div>
 
       <Tabs defaultValue="text" className="w-full">
         <TabsList className="mb-3 w-full grid grid-cols-3">
@@ -81,13 +111,23 @@ const JobSpecInput = ({ value, onChange, onError }: JobSpecInputProps) => {
 
         <AnimatePresence mode="wait">
           <TabsContent value="text" key="text">
-            <motion.div {...tabContentAnimation}>
+            <motion.div {...tabContentAnimation} className="relative">
               <Textarea
                 placeholder="Paste the job specification here..."
                 value={value}
                 onChange={handleTextChange}
-                className="min-h-[160px] transition-all duration-200 focus:neon-glow"
+                className="min-h-[160px] transition-all duration-200 focus:neon-glow pr-8"
               />
+              {value && (
+                <button
+                  onClick={handleClear}
+                  className="absolute top-2 right-2 p-1 text-muted-foreground hover:text-foreground bg-background/50 rounded-full transition-colors"
+                  aria-label="Clear job specification"
+                  type="button"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              )}
             </motion.div>
           </TabsContent>
 

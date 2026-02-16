@@ -5,13 +5,6 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { buttonVariants } from "@/components/ui/button";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
   Popover,
   PopoverContent,
   PopoverTrigger,
@@ -67,10 +60,61 @@ const workloadOptions: { id: ApiWorkload; label: string; description: string }[]
 ];
 
 const coverLetterOptions: { id: CoverLetterStyle; label: string }[] = [
-  { id: "Short", label: "Quick Email (Short)" },
-  { id: "Middle", label: "Formal Letter (Medium)" },
-  { id: "Long", label: "Detailed Letter (Long)" },
+  { id: "Short", label: "Quick (Short)" },
+  { id: "Middle", label: "Formal (Medium)" },
+  { id: "Long", label: "Detailed (Long)" },
 ];
+
+const TabSelector = ({
+  options,
+  value,
+  onChange,
+  disabled,
+  layoutId,
+}: {
+  options: { id: string; label: string }[];
+  value: string;
+  onChange: (value: any) => void;
+  disabled?: boolean;
+  layoutId: string;
+}) => {
+  return (
+    <div
+      className={cn(
+        "grid w-full grid-cols-3 gap-1 rounded-lg bg-muted p-1 text-muted-foreground",
+        disabled && "opacity-50 pointer-events-none"
+      )}
+    >
+      {options.map((opt) => {
+        const isSelected = value === opt.id;
+        return (
+          <button
+            key={opt.id}
+            type="button"
+            onClick={() => onChange(opt.id)}
+            className={cn(
+              "relative z-10 flex flex-col items-center justify-center rounded-md px-2 py-1.5 text-xs font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 sm:text-sm",
+              isSelected
+                ? "text-foreground shadow-sm"
+                : "hover:bg-background/50 hover:text-foreground"
+            )}
+          >
+            {isSelected && (
+              <motion.div
+                layoutId={layoutId}
+                className="absolute inset-0 z-0 rounded-md bg-background shadow-sm"
+                transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+              />
+            )}
+            <span className="relative z-10 text-center leading-tight">
+              {opt.label}
+            </span>
+          </button>
+        );
+      })}
+    </div>
+  );
+};
 
 const TailorSection = ({
   keywords,
@@ -109,8 +153,8 @@ const TailorSection = ({
 
       <div className="space-y-3">
         <Label className="text-sm font-semibold">Update Style</Label>
-        {/* Mobile-friendly: horizontal scroll on small screens, flex-wrap on larger */}
-        <div className="flex gap-3 overflow-x-auto pb-2 sm:flex-wrap sm:overflow-visible sm:pb-0 scrollbar-hide">
+        {/* Mobile-friendly: smaller buttons on mobile to fit one row */}
+        <div className="flex flex-wrap gap-2">
           {styles.map((s) => {
             const isSelected = selectedStyles.includes(s.id);
             return (
@@ -119,7 +163,7 @@ const TailorSection = ({
                 data-testid={`style-option-${s.id}`}
                 className={cn(
                   buttonVariants({ variant: isSelected ? "default" : "outline" }),
-                  "gap-0 p-0 overflow-hidden transition-all duration-200 shrink-0",
+                  "gap-0 p-0 overflow-hidden transition-all duration-200",
                   isSelected
                     ? "bg-hero-500 text-hero-800 hover:bg-hero-600 border-hero-500 ring-2 ring-hero-500 ring-offset-2"
                     : "hover:bg-hero-100/50 hover:text-hero-800 hover:border-hero-500"
@@ -128,7 +172,7 @@ const TailorSection = ({
                 <button
                   type="button"
                   onClick={() => toggleStyle(s.id)}
-                  className="pl-4 pr-1 py-2 h-full flex items-center justify-center font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-ring whitespace-nowrap"
+                  className="flex h-full items-center justify-center whitespace-nowrap px-3 py-1 text-xs font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-ring sm:px-4 sm:py-2 sm:text-sm"
                 >
                   {s.label}
                 </button>
@@ -161,24 +205,17 @@ const TailorSection = ({
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="space-y-3">
           <Label className="text-sm font-semibold">Cover Letter Style</Label>
-          <Select
+          <TabSelector
+            options={coverLetterOptions}
             value={coverLetterStyle}
-            onValueChange={(v) => setCoverLetterStyle(v as CoverLetterStyle)}
+            onChange={(v) => setCoverLetterStyle(v as CoverLetterStyle)}
             disabled={apiWorkload === "Minimal"}
-          >
-            <SelectTrigger className="w-full">
-              <SelectValue placeholder="Select style" />
-            </SelectTrigger>
-            <SelectContent>
-              {coverLetterOptions.map((opt) => (
-                <SelectItem key={opt.id} value={opt.id}>
-                  {opt.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+            layoutId="cover-letter-style"
+          />
           {apiWorkload === "Minimal" && (
-            <p className="text-xs text-muted-foreground">Disabled in Minimal mode.</p>
+            <p className="text-xs text-muted-foreground">
+              Disabled in Minimal mode.
+            </p>
           )}
         </div>
 
@@ -199,7 +236,10 @@ const TailorSection = ({
                 <div className="space-y-2">
                   <h4 className="font-semibold">Workload Levels</h4>
                   {workloadOptions.map((opt) => (
-                    <div key={opt.id} className="grid grid-cols-[60px_1fr] gap-2">
+                    <div
+                      key={opt.id}
+                      className="grid grid-cols-[60px_1fr] gap-2"
+                    >
                       <span className="font-bold">{opt.label}:</span>
                       <span>{opt.description}</span>
                     </div>
@@ -208,18 +248,12 @@ const TailorSection = ({
               </PopoverContent>
             </Popover>
           </div>
-          <Select value={apiWorkload} onValueChange={(v) => setApiWorkload(v as ApiWorkload)}>
-            <SelectTrigger className="w-full">
-              <SelectValue placeholder="Select workload" />
-            </SelectTrigger>
-            <SelectContent>
-              {workloadOptions.map((opt) => (
-                <SelectItem key={opt.id} value={opt.id}>
-                  {opt.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <TabSelector
+            options={workloadOptions}
+            value={apiWorkload}
+            onChange={(v) => setApiWorkload(v as ApiWorkload)}
+            layoutId="api-workload"
+          />
         </div>
       </div>
     </motion.div>

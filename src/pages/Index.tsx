@@ -43,9 +43,14 @@ const Index = () => {
   });
   const [cvText, setCvText] = useState("");
   const [currentFileName, setCurrentFileName] = useState<string | null>(null);
+  const [rememberJobSpec, setRememberJobSpec] = useState(() => {
+    if (typeof window === "undefined") return false;
+    return localStorage.getItem("remember-job-spec") === "true";
+  });
   const [jobSpecText, setJobSpecText] = useState(() => {
     if (typeof window === "undefined") return "";
-    return localStorage.getItem("saved-job-spec") || "";
+    const shouldRemember = localStorage.getItem("remember-job-spec") === "true";
+    return shouldRemember ? localStorage.getItem("saved-job-spec") || "" : "";
   });
   const debouncedJobSpecText = useDebounce(jobSpecText, 500);
   const [keywords, setKeywords] = useState("");
@@ -85,8 +90,13 @@ const Index = () => {
   }, [savedCVs]);
 
   useEffect(() => {
-    localStorage.setItem("saved-job-spec", debouncedJobSpecText);
-  }, [debouncedJobSpecText]);
+    localStorage.setItem("remember-job-spec", String(rememberJobSpec));
+    if (rememberJobSpec) {
+      localStorage.setItem("saved-job-spec", debouncedJobSpecText);
+    } else {
+      localStorage.removeItem("saved-job-spec");
+    }
+  }, [debouncedJobSpecText, rememberJobSpec]);
 
   useEffect(() => {
     if (saveCV && savedCVs.length > 0 && !cvText && !currentFileName) {
@@ -205,7 +215,13 @@ const Index = () => {
             fileName={currentFileName}
           />
 
-          <JobSpecInput value={jobSpecText} onChange={setJobSpecText} onError={handleError} />
+          <JobSpecInput
+            value={jobSpecText}
+            onChange={setJobSpecText}
+            onError={handleError}
+            rememberJobSpec={rememberJobSpec}
+            onRememberChange={setRememberJobSpec}
+          />
 
           <TailorSection
             keywords={keywords}
