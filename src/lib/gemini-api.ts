@@ -6,28 +6,24 @@
 const GEMINI_API_URL =
   "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent";
 
-const SYSTEM_INSTRUCTION = `You are Bruce, the CV Spruce agent, an expert career advisor and executive recruiter. You will be provided with a candidate's current CV and a target Job Specification. Your task is to analyse both inputs and output a structured JSON object.
+export type TailorStyle = "Precision" | "Ruthless" | "Ambitious";
+export type CoverLetterStyle = "Short" | "Middle" | "Long";
+export type ApiWorkload = "Normal" | "Reduced" | "Minimal";
 
-Format requirements:
-'match_percentage': An integer from 0 to 100 representing how well the original CV aligns with the job specification.
-'missing_skills': An array of up to 5 key skills or requirements from the job specification that the candidate lacks.
-'tailored_cv': A string containing the rewritten CV in clean Markdown format. Optimise the candidate's experience and skills to closely align with the job specification.
-'cover_letter': A string containing a professional, concise email introduction or cover letter in Markdown format tailored to the role.
-'interview_qna': An array of exactly 5 objects (each with a 'question' and 'answer' string), focusing on technical and behavioural aspects relevant to the job.
-'industry_updates': An array of exactly 5 strings detailing recent trends or news pertaining to the industry.
-
-Ensure all text uses UK English spelling.`;
+export interface IndustryUpdate {
+  update: string;
+  source?: string;
+}
 
 export interface GeminiResponse {
   match_percentage: number;
+  matching_highlights?: string[];
   missing_skills: string[];
   tailored_cv: string;
-  cover_letter: string;
-  interview_qna: Array<{ question: string; answer: string }>;
-  industry_updates: string[];
+  cover_letter?: string;
+  interview_qna?: Array<{ question: string; answer: string }>;
+  industry_updates?: IndustryUpdate[];
 }
-
-export type TailorStyle = "Precision" | "Ruthless" | "Ambitious";
 
 const isStringArray = (value: unknown): value is string[] =>
   Array.isArray(value) && value.every((item) => typeof item === "string");
@@ -44,12 +40,25 @@ const isQnaArray = (
       typeof (item as Record<string, unknown>).answer === "string"
   );
 
+const isIndustryUpdateArray = (
+  value: unknown
+): value is IndustryUpdate[] =>
+  Array.isArray(value) &&
+  value.every(
+    (item: unknown) =>
+      typeof item === "object" &&
+      item !== null &&
+      typeof (item as Record<string, unknown>).update === "string"
+  );
+
 export async function callGeminiApi(
   apiKey: string,
   cvText: string,
   jobSpecText: string,
   keywords: string = "",
-  styles: TailorStyle[] = ["Precision"]
+  styles: TailorStyle[] = ["Precision"],
+  coverLetterStyle: CoverLetterStyle = "Middle",
+  apiWorkload: ApiWorkload = "Normal"
 ): Promise<GeminiResponse> {
   if (!apiKey.trim()) {
     throw new Error("Please enter your Gemini API key.");
@@ -71,6 +80,70 @@ export async function callGeminiApi(
     .map((s) => `${s}: ${styleInstructions[s]}`)
     .join("\n");
 
+  const coverLetterInstructions: Record<CoverLetterStyle, string> = {
+    Short: "A quick, concise email introduction.",
+    Middle: "A standard formal cover letter.",
+    Long: "An expanded, detailed cover letter highlighting extensive alignment.",
+  };
+
+  const baseSystemInstruction = `You are Bruce, the CV Spruce agent, an expert career advisor and executive recruiter. You will be provided with a candidate's current CV and a target Job Specification. Your task is to analyse both inputs and output a structured JSON object.
+
+Format requirements:
+'match_percentage': An integer from 0 to 100 representing how well the original CV aligns with the job specification.
+'matching_highlights': An array of 2 to 3 brief bullet points highlighting positive aspects of the candidate's existing experience relevant to the job.
+'missing_skills': An array of up to 5 key skills or requirements from the job specification that the candidate lacks.
+'tailored_cv': A string containing the rewritten CV in clean Markdown format. Optimise the candidate's experience and skills to closely align with the job specification.
+Ensure all text uses UK English spelling.`;
+
+  let finalSystemInstruction = baseSystemInstruction;
+  let responseSchema: Record<string, any> = {
+    type: "OBJECT",
+    properties: {
+      match_percentage: { type: "INTEGER" },
+      matching_highlights: { type: "ARRAY", items: { type: "STRING" } },
+      missing_skills: { type: "ARRAY", items: { type: "STRING" } },
+      tailored_cv: { type: "STRING" },
+    },
+    required: ["match_percentage", "matching_highlights", "missing_skills", "tailored_cv"],
+  };
+
+  if (apiWorkload !== "Minimal") {
+    // Reduced or Normal: Add Cover Letter
+    finalSystemInstruction += `\n'cover_letter': A string containing a ${coverLetterInstructions[coverLetterStyle]} in Markdown format.`;
+    responseSchema.properties.cover_letter = { type: "STRING" };
+    responseSchema.required.push("cover_letter");
+  }
+
+  if (apiWorkload === "Normal") {
+    // Normal: Add Q&A and Insights
+    finalSystemInstruction += `\n'interview_qna': An array of exactly 5 objects (each with a 'question' and 'answer' string), focusing on technical and behavioural aspects relevant to the job.`;
+    finalSystemInstruction += `\n'industry_updates': An array of exactly 5 objects (each with 'update' string and optional 'source' string) detailing recent trends or news pertaining to the industry. If possible, provide a source link.`;
+
+    responseSchema.properties.interview_qna = {
+      type: "ARRAY",
+      items: {
+        type: "OBJECT",
+        properties: {
+          question: { type: "STRING" },
+          answer: { type: "STRING" },
+        },
+        required: ["question", "answer"],
+      },
+    };
+    responseSchema.properties.industry_updates = {
+      type: "ARRAY",
+      items: {
+        type: "OBJECT",
+        properties: {
+          update: { type: "STRING" },
+          source: { type: "STRING" },
+        },
+        required: ["update"],
+      },
+    };
+    responseSchema.required.push("interview_qna", "industry_updates");
+  }
+
   const userPrompt = `Below is a candidate's CV and a job specification. Please process them according to the system instructions.
 ### CANDIDATE CV ###
 ${cvText.replace(/###/g, "# # #")}
@@ -91,7 +164,7 @@ ${selectedStylesInstructions}
 
   const requestBody = {
     system_instruction: {
-      parts: [{ text: SYSTEM_INSTRUCTION }],
+      parts: [{ text: finalSystemInstruction }],
     },
     contents: [
       {
@@ -103,28 +176,7 @@ ${selectedStylesInstructions}
       topP: 0.95,
       topK: 40,
       responseMimeType: "application/json",
-      responseSchema: {
-        type: "OBJECT",
-        properties: {
-          match_percentage: { type: "INTEGER" },
-          missing_skills: { type: "ARRAY", items: { type: "STRING" } },
-          tailored_cv: { type: "STRING" },
-          cover_letter: { type: "STRING" },
-          interview_qna: {
-            type: "ARRAY",
-            items: {
-              type: "OBJECT",
-              properties: {
-                question: { type: "STRING" },
-                answer: { type: "STRING" }
-              },
-              required: ["question", "answer"]
-            }
-          },
-          industry_updates: { type: "ARRAY", items: { type: "STRING" } }
-        },
-        required: ["match_percentage", "missing_skills", "tailored_cv", "cover_letter", "interview_qna", "industry_updates"]
-      }
+      responseSchema: responseSchema,
     },
   };
 
@@ -174,21 +226,29 @@ ${selectedStylesInstructions}
 
     const parsed: GeminiResponse = JSON.parse(cleaned);
 
-    // Validate the structure
-    // We rely on Gemini's responseSchema to enforce the structure.
-    // However, more thorough validation on the client is good practice.
+    // Validate the structure based on workload
+    // Always check base fields
     if (
       !parsed ||
       typeof parsed.match_percentage !== "number" ||
       !isStringArray(parsed.missing_skills) ||
-      typeof parsed.tailored_cv !== "string" ||
-      typeof parsed.cover_letter !== "string" ||
-      !isQnaArray(parsed.interview_qna) ||
-      !isStringArray(parsed.industry_updates)
+      typeof parsed.tailored_cv !== "string"
     ) {
       throw new Error(
-        "The API response is missing required fields or has an invalid structure."
+        "The API response is missing required fields (Match, CV)."
       );
+    }
+
+    if (apiWorkload !== "Minimal") {
+      if (typeof parsed.cover_letter !== "string") {
+        throw new Error("The API response is missing the Cover Letter.");
+      }
+    }
+
+    if (apiWorkload === "Normal") {
+      if (!isQnaArray(parsed.interview_qna) || !isIndustryUpdateArray(parsed.industry_updates)) {
+        throw new Error("The API response is missing Q&A or Industry Updates.");
+      }
     }
 
     return parsed;

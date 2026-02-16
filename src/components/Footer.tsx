@@ -46,6 +46,9 @@ const Footer = () => {
               <li>
                 <a href="https://vitejs.dev/" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">Vite</a> - Build Tool
               </li>
+              <li>
+                <a href="https://github.com/knadh/oat" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">@knadh/oat</a> - Experimental UI Library
+              </li>
             </ul>
           </DialogContent>
         </Dialog>

@@ -10,7 +10,13 @@ import ResultsDisplay from "@/components/cv-optimiser/ResultsDisplay";
 import TailorSection from "@/components/cv-optimiser/TailorSection";
 import GenerateButton from "@/components/cv-optimiser/GenerateButton";
 import Footer from "@/components/Footer";
-import { callGeminiApi, type GeminiResponse, type TailorStyle } from "@/lib/gemini-api";
+import {
+  callGeminiApi,
+  type GeminiResponse,
+  type TailorStyle,
+  type CoverLetterStyle,
+  type ApiWorkload
+} from "@/lib/gemini-api";
 import { useToast } from "@/hooks/use-toast";
 import { useDebounce } from "@/hooks/use-debounce";
 
@@ -44,6 +50,9 @@ const Index = () => {
   const debouncedJobSpecText = useDebounce(jobSpecText, 500);
   const [keywords, setKeywords] = useState("");
   const [styles, setStyles] = useState<TailorStyle[]>(["Precision"]);
+  const [coverLetterStyle, setCoverLetterStyle] = useState<CoverLetterStyle>("Middle");
+  const [apiWorkload, setApiWorkload] = useState<ApiWorkload>("Normal");
+
   const [loading, setLoading] = useState(false);
   const [results, setResults] = useState<GeminiResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -141,7 +150,15 @@ const Index = () => {
     setLoading(true);
 
     try {
-      const data = await callGeminiApi(apiKey, cvText, jobSpecText, keywords, styles);
+      const data = await callGeminiApi(
+        apiKey,
+        cvText,
+        jobSpecText,
+        keywords,
+        styles,
+        coverLetterStyle,
+        apiWorkload
+      );
       setResults(data);
       toast({ title: "Success", description: "Your optimised content is ready." });
     } catch (err: any) {
@@ -195,6 +212,10 @@ const Index = () => {
             setKeywords={setKeywords}
             selectedStyles={styles}
             setSelectedStyles={setStyles}
+            coverLetterStyle={coverLetterStyle}
+            setCoverLetterStyle={setCoverLetterStyle}
+            apiWorkload={apiWorkload}
+            setApiWorkload={setApiWorkload}
           />
 
           {/* Error banner */}
@@ -245,7 +266,7 @@ const Index = () => {
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.3 }}
               >
-                <ResultsDisplay data={results} />
+                <ResultsDisplay data={results} originalCvText={cvText} />
               </motion.div>
             )}
           </AnimatePresence>
