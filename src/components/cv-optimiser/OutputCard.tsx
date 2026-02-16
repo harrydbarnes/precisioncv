@@ -75,7 +75,7 @@ const OutputCard = ({ title, icon, content, copyText, index, originalText }: Out
         {/* Top accent border */}
         <div className="absolute left-0 right-0 top-0 h-1 gradient-neon" />
 
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+        <CardHeader className="flex-row items-center justify-between space-y-0 pb-3">
           <div className="flex items-center gap-3">
             <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 text-primary transition-transform duration-300 group-hover:scale-110">
               {icon}
