@@ -129,7 +129,7 @@ const ResultsDisplay = ({ data, originalCvText }: ResultsDisplayProps) => {
                   <span>{item.update}</span>
                   {item.source && (
                     <a
-                      href={item.source}
+href={item.source && (item.source.startsWith('http://') || item.source.startsWith('https://')) ? item.source : '#'}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="ml-2 inline-flex items-center text-xs text-primary hover:underline gap-0.5"
