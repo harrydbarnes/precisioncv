@@ -1,5 +1,5 @@
 import { useState, memo } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { Eye, EyeOff, Key, Info, Check } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -60,16 +60,6 @@ const ApiKeyInput = ({ value, onChange, saveKey, onSaveKeyChange }: ApiKeyInputP
           </Popover>
         </div>
         <div className="flex items-center gap-2">
-          {saveKey && (
-            <motion.span
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              className="text-xs text-green-500 flex items-center gap-1 font-medium"
-            >
-              <Check className="h-3 w-3" />
-              Saved
-            </motion.span>
-          )}
           <Label htmlFor="save-key" className="text-xs cursor-pointer">Save API Key</Label>
           <Switch
             id="save-key"
@@ -89,18 +79,34 @@ const ApiKeyInput = ({ value, onChange, saveKey, onSaveKeyChange }: ApiKeyInputP
           placeholder="Enter your Gemini API key"
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          className="pr-10 transition-all duration-200 focus:neon-glow"
+          className="pr-24 transition-all duration-200 focus:neon-glow"
         />
-        <Button
-          type="button"
-          variant="ghost"
-          size="icon"
-          className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8"
-          onClick={() => setVisible(!visible)}
-          aria-label={visible ? "Hide API key" : "Show API key"}
-        >
-          {visible ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-        </Button>
+        <div className="absolute right-1 top-1/2 -translate-y-1/2 flex items-center gap-2">
+          <AnimatePresence>
+            {saveKey && (
+              <motion.span
+                initial={{ opacity: 0, x: 10 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 10 }}
+                transition={{ duration: 0.2 }}
+                className="text-xs text-hero-800 flex items-center gap-1 font-medium pointer-events-none select-none"
+              >
+                <Check className="h-3 w-3" />
+                Saved
+              </motion.span>
+            )}
+          </AnimatePresence>
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8"
+            onClick={() => setVisible(!visible)}
+            aria-label={visible ? "Hide API key" : "Show API key"}
+          >
+            {visible ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+          </Button>
+        </div>
       </div>
     </motion.div>
   );
