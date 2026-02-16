@@ -231,6 +231,7 @@ ${selectedStylesInstructions}
     if (
       !parsed ||
       typeof parsed.match_percentage !== "number" ||
+      !isStringArray(parsed.matching_highlights) ||
       !isStringArray(parsed.missing_skills) ||
       typeof parsed.tailored_cv !== "string"
     ) {
