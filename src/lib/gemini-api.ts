@@ -17,7 +17,7 @@ export interface IndustryUpdate {
 
 export interface GeminiResponse {
   match_percentage: number;
-  matching_highlights?: string[];
+  matching_highlights: string[];
   missing_skills: string[];
   tailored_cv: string;
   cover_letter?: string;
