@@ -35,13 +35,12 @@ describe("OutputCard", () => {
     // - "Modified" (added)
     // - " content" (common)
 
-    // We expect "Removed: Original" and "Added: Modified" text to be present (hidden or visible)
-    // Using getAllByText with exact: false allows finding substrings
-    const removedLabels = screen.queryAllByText(/Removed:/i);
-    const addedLabels = screen.queryAllByText(/Added:/i);
+    // We expect "Removed: Original" and "Added: Modified" text to be present for screen readers.
+    // By checking the parent element's text content, we can verify the full accessible string.
+    const removedPart = screen.getByText("Original");
+    expect(removedPart.parentElement).toHaveTextContent("Removed: Original");
 
-    // This should fail initially as these labels are not implemented
-    expect(removedLabels.length).toBeGreaterThan(0);
-    expect(addedLabels.length).toBeGreaterThan(0);
+    const addedPart = screen.getByText("Modified");
+    expect(addedPart.parentElement).toHaveTextContent("Added: Modified");
   });
 });
