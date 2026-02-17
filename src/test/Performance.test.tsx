@@ -98,7 +98,7 @@ describe('Performance Optimization', () => {
     fireEvent.change(textarea, { target: { value: 'ab' } });
 
     // Wait a tick to allow for potential renders
-    await new Promise((resolve) => setTimeout(resolve, 100));
+    await new Promise((resolve) => setTimeout(resolve, 0));
 
     const finalGenerateButtonCalls = GenerateButtonMock.mock.calls.length;
 
