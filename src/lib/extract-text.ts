@@ -22,11 +22,72 @@ declare global {
  */
 const CORS_PROXY_URL = "https://api.codetabs.com/v1/proxy?quest=";
 
+// Constants for external libraries
+const PDFJS_SRC = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js";
+const PDFJS_INTEGRITY = "sha384-/1qUCSGwTur9vjf/z9lmu/eCUYbpOTgSjmpbMQZ1/CtX2v/WcAIKqRv+U1DUCG6e";
+const PDFJS_WORKER_SRC = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+const PDFJS_WORKER_INTEGRITY = "sha384-SnzOobpRMLXZ52iJvZm/C0fYw0OQemTXzTjIsdsfMcrCtCEe9qgzxTd3RSklO5x2";
+
+const MAMMOTH_SRC = "https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js";
+const MAMMOTH_INTEGRITY = "sha384-nFoSjZIoH3CCp8W639jJyQkuPHinJ2NHe7on1xvlUA7SuGfJAfvMldrsoAVm6ECz";
+
+// Helper to load external scripts dynamically
+const loadScript = (src: string, integrity?: string, crossorigin: string = "anonymous"): Promise<void> => {
+  return new Promise((resolve, reject) => {
+    if (document.querySelector(`script[src="${src}"]`)) {
+      resolve();
+      return;
+    }
+    const script = document.createElement("script");
+    script.src = src;
+    if (integrity) script.integrity = integrity;
+    if (crossorigin) script.crossOrigin = crossorigin;
+    script.onload = () => resolve();
+    script.onerror = () => reject(new Error(`Failed to load script: ${src}`));
+    document.head.appendChild(script);
+  });
+};
+
+let pdfJsLoadingPromise: Promise<void> | null = null;
+let mammothLoadingPromise: Promise<void> | null = null;
+
+async function loadPdfJs() {
+  if (window.pdfjsLib) return;
+
+  if (!pdfJsLoadingPromise) {
+    pdfJsLoadingPromise = (async () => {
+      await loadScript(PDFJS_SRC, PDFJS_INTEGRITY);
+
+      if (window.pdfjsLib && !window.pdfjsLib.GlobalWorkerOptions.workerSrc) {
+        try {
+          const response = await fetch(PDFJS_WORKER_SRC, { integrity: PDFJS_WORKER_INTEGRITY });
+          if (!response.ok) throw new Error(`Failed to fetch worker: ${response.status}`);
+          const blob = await response.blob();
+          window.pdfjsLib.GlobalWorkerOptions.workerSrc = URL.createObjectURL(blob);
+        } catch (error) {
+          console.error('Failed to set up PDF.js worker with SRI:', error);
+        }
+      }
+    })();
+  }
+  return pdfJsLoadingPromise;
+}
+
+async function loadMammoth() {
+  if (window.mammoth) return;
+
+  if (!mammothLoadingPromise) {
+    mammothLoadingPromise = loadScript(MAMMOTH_SRC, MAMMOTH_INTEGRITY);
+  }
+  return mammothLoadingPromise;
+}
+
 /** Extract text from a PDF file using pdf.js */
 async function extractFromPdf(file: File): Promise<string> {
+  await loadPdfJs();
   const pdfjsLib = window.pdfjsLib;
   if (!pdfjsLib) {
-    throw new Error("PDF.js library not loaded. Please refresh the page and try again.");
+    throw new Error("PDF.js library failed to load. Please try again.");
   }
 
   const arrayBuffer = await file.arrayBuffer();
@@ -47,9 +108,10 @@ async function extractFromPdf(file: File): Promise<string> {
 
 /** Extract text from a DOCX file using mammoth.js */
 async function extractFromDocx(file: File): Promise<string> {
+  await loadMammoth();
   const mammoth = window.mammoth;
   if (!mammoth) {
-    throw new Error("Mammoth.js library not loaded. Please refresh the page and try again.");
+    throw new Error("Mammoth.js library failed to load. Please try again.");
   }
 
   const arrayBuffer = await file.arrayBuffer();
