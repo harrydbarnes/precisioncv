@@ -19,17 +19,12 @@ import {
 } from "@/lib/gemini-api";
 import { useToast } from "@/hooks/use-toast";
 import { useDebounce } from "@/hooks/use-debounce";
+import { usePersistentApiKey } from "@/hooks/use-persistent-api-key";
 
 const EMPTY_ARRAY: string[] = [];
 
 const Index = () => {
-  const [apiKey, setApiKey] = useState(() => sessionStorage.getItem("gemini-key") || "");
-  const [saveKey, setSaveKey] = useState(() => {
-    if (typeof window === "undefined") {
-      return true; // Default to true on the server
-    }
-    return localStorage.getItem("save-gemini-key") !== "false";
-  });
+  const { apiKey, setApiKey, saveKey, setSaveKey } = usePersistentApiKey();
   const [savedCVs, setSavedCVs] = useState<SavedCV[]>(() => {
     if (typeof window === "undefined") return [];
     try {
@@ -65,19 +60,6 @@ const Index = () => {
   const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
 
-  // Persist saveKey preference
-  useEffect(() => {
-    localStorage.setItem("save-gemini-key", String(saveKey));
-  }, [saveKey]);
-
-  // Persist API key in session storage
-  useEffect(() => {
-    if (saveKey && apiKey) {
-      sessionStorage.setItem("gemini-key", apiKey);
-    } else {
-      sessionStorage.removeItem("gemini-key");
-    }
-  }, [apiKey, saveKey]);
 
   useEffect(() => {
     localStorage.setItem("save-cv-pref", String(saveCV));
