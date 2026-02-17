@@ -32,6 +32,10 @@ describe("TabSelector", () => {
     const infoButton = screen.getByLabelText("Information about Option 1");
     expect(infoButton).toBeDisabled();
 
+    // Verify main tab button is also disabled
+    const mainButton = screen.getByRole('button', { name: 'Option 1' });
+    expect(mainButton).toBeDisabled();
+
     // Verify parent container does not apply nested opacity
     const parent = screen.getByTestId("tab-selector");
     expect(parent).not.toHaveClass("opacity-50");
