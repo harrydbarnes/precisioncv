@@ -53,6 +53,8 @@ const OutputCard = ({ title, icon, content, copyText, index, originalText }: Out
               : "text-muted-foreground opacity-70";
           return (
             <span key={i} className={color}>
+              {part.added && <span className="sr-only">Added: </span>}
+              {part.removed && <span className="sr-only">Removed: </span>}
               {part.value}
             </span>
           );
