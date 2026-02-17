@@ -23,7 +23,10 @@ import { useDebounce } from "@/hooks/use-debounce";
 const EMPTY_ARRAY: string[] = [];
 
 const Index = () => {
-  const [apiKey, setApiKey] = useState(() => sessionStorage.getItem("gemini-key") || "");
+  const [apiKey, setApiKey] = useState(() => {
+    if (typeof window === "undefined") return "";
+    return localStorage.getItem("gemini-key") || sessionStorage.getItem("gemini-key") || "";
+  });
   const [saveKey, setSaveKey] = useState(() => {
     if (typeof window === "undefined") {
       return true; // Default to true on the server
@@ -70,11 +73,14 @@ const Index = () => {
     localStorage.setItem("save-gemini-key", String(saveKey));
   }, [saveKey]);
 
-  // Persist API key in session storage
+  // Persist API key in local storage
   useEffect(() => {
     if (saveKey && apiKey) {
-      sessionStorage.setItem("gemini-key", apiKey);
+      localStorage.setItem("gemini-key", apiKey);
+      // Clear session storage to avoid confusion/duplication
+      sessionStorage.removeItem("gemini-key");
     } else {
+      localStorage.removeItem("gemini-key");
       sessionStorage.removeItem("gemini-key");
     }
   }, [apiKey, saveKey]);

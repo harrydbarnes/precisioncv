@@ -21,4 +21,19 @@ describe("ApiKeyInput", () => {
     });
     expect(helpButton).toBeInTheDocument();
   });
+
+  it("displays the correct storage information", () => {
+    render(
+      <TooltipProvider>
+        <ApiKeyInput
+          value=""
+          onChange={() => {}}
+          saveKey={false}
+          onSaveKeyChange={() => {}}
+        />
+      </TooltipProvider>
+    );
+
+    expect(screen.getByText(/stored in your browser's local storage/i)).toBeInTheDocument();
+  });
 });
