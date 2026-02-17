@@ -50,6 +50,7 @@ export const TabSelector = memo(({
             <button
               type="button"
               onClick={() => onChange(opt.id)}
+              disabled={disabled}
               className="relative z-10 flex flex-grow items-center justify-center rounded-md px-2 py-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50"
             >
               <span className="text-center leading-tight">
