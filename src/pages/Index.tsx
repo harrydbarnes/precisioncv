@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useMemo, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { AlertCircle } from "lucide-react";
 import Header from "@/components/cv-optimiser/Header";
@@ -19,6 +19,8 @@ import {
 } from "@/lib/gemini-api";
 import { useToast } from "@/hooks/use-toast";
 import { useDebounce } from "@/hooks/use-debounce";
+
+const EMPTY_ARRAY: string[] = [];
 
 const Index = () => {
   const [apiKey, setApiKey] = useState(() => sessionStorage.getItem("gemini-key") || "");
@@ -178,10 +180,22 @@ const Index = () => {
     }
   };
 
-  const missingRequirements: string[] = [];
-  if (!apiKey.trim()) missingRequirements.push("Gemini API Key");
-  if (!cvText.trim()) missingRequirements.push("CV Upload");
-  if (!jobSpecText.trim()) missingRequirements.push("Job Specification");
+  // Stable handler pattern to prevent GenerateButton re-renders
+  const handleGenerateRef = useRef<typeof handleGenerate>();
+  handleGenerateRef.current = handleGenerate;
+
+  const onGenerate = useCallback(() => {
+    // The ref is always populated during render, so it's safe to use the non-null assertion.
+    handleGenerateRef.current!();
+  }, []);
+
+  const missingRequirements = useMemo(() => {
+    const reqs: string[] = [];
+    if (!apiKey.trim()) reqs.push("Gemini API Key");
+    if (!cvText.trim()) reqs.push("CV Upload");
+    if (!jobSpecText.trim()) reqs.push("Job Specification");
+    return reqs.length === 0 ? EMPTY_ARRAY : reqs;
+  }, [apiKey, cvText, jobSpecText]);
 
   return (
     <div className="min-h-screen bg-background">
@@ -254,7 +268,7 @@ const Index = () => {
             <GenerateButton
               loading={loading}
               missingRequirements={missingRequirements}
-              onGenerate={handleGenerate}
+              onGenerate={onGenerate}
             />
           </div>
         </motion.section>

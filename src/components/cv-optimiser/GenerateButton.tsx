@@ -1,3 +1,4 @@
+import { memo } from "react";
 import { Loader2, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -53,4 +54,4 @@ const GenerateButton = ({ loading, missingRequirements, onGenerate }: GenerateBu
   return button;
 };
 
-export default GenerateButton;
+export default memo(GenerateButton);
