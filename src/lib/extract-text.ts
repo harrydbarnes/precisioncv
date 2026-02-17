@@ -105,13 +105,12 @@ export async function extractTextFromUrl(url: string): Promise<string> {
   if (
     hostname === "localhost" ||
     hostname === "127.0.0.1" ||
+    hostname === "0.0.0.0" ||
+    hostname === "169.254.169.254" ||
     hostname === "[::1]" ||
+    hostname === "[::]" ||
     hostname.startsWith("127.")
   ) {
-    throw new Error(
-      "Access to local network resources is not allowed for security reasons."
-    );
-  }
 
   const proxyUrl = `${CORS_PROXY_URL}${encodeURIComponent(url)}`;
 
