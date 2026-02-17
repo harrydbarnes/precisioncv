@@ -182,9 +182,8 @@ const Index = () => {
 
   // Stable handler pattern to prevent GenerateButton re-renders
   const handleGenerateRef = useRef(handleGenerate);
-  useEffect(() => {
-    handleGenerateRef.current = handleGenerate;
-  });
+  // Update ref directly in render for efficiency (safe as it's only read in event handler)
+  handleGenerateRef.current = handleGenerate;
 
   const onGenerate = useCallback(() => {
     handleGenerateRef.current();
