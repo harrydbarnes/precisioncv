@@ -171,13 +171,20 @@ const Index = () => {
     handleGenerateRef.current!();
   }, []);
 
+  // Derived state for missing requirements.
+  // Using a string key to ensure stable array reference when contents are identical
+  // (prevents re-renders of GenerateButton when typing in inputs that don't change validity).
+  const missingReqsKey = [
+    !apiKey.trim() ? "Gemini API Key" : "",
+    !cvText.trim() ? "CV Upload" : "",
+    !jobSpecText.trim() ? "Job Specification" : "",
+  ]
+    .filter(Boolean)
+    .join("|");
+
   const missingRequirements = useMemo(() => {
-    const reqs: string[] = [];
-    if (!apiKey.trim()) reqs.push("Gemini API Key");
-    if (!cvText.trim()) reqs.push("CV Upload");
-    if (!jobSpecText.trim()) reqs.push("Job Specification");
-    return reqs.length === 0 ? EMPTY_ARRAY : reqs;
-  }, [apiKey, cvText, jobSpecText]);
+    return missingReqsKey ? missingReqsKey.split("|") : EMPTY_ARRAY;
+  }, [missingReqsKey]);
 
   return (
     <div className="min-h-screen bg-background">
