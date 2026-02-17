@@ -1,13 +1,7 @@
 import { memo, useCallback } from "react";
 import { motion } from "framer-motion";
-import { Info } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
 import { TailorStyle, CoverLetterStyle, ApiWorkload } from "@/lib/gemini-api";
 import { StyleSelector } from "./StyleSelector";
 import { TabSelector } from "./TabSelector";
@@ -42,9 +36,9 @@ const workloadOptions: { id: ApiWorkload; label: string; description: string }[]
 ];
 
 const coverLetterOptions: { id: CoverLetterStyle; label: string }[] = [
-  { id: "Short", label: "Quick (Short)" },
-  { id: "Middle", label: "Formal (Medium)" },
-  { id: "Long", label: "Detailed (Long)" },
+  { id: "Short", label: "Quick" },
+  { id: "Middle", label: "Formal" },
+  { id: "Long", label: "Detailed" },
 ];
 
 const TailorSection = ({
@@ -109,34 +103,7 @@ const TailorSection = ({
         </div>
 
         <div className="space-y-3">
-          <div className="flex items-center gap-2">
-            <Label className="text-sm font-semibold">API Workload</Label>
-            <Popover>
-              <PopoverTrigger asChild>
-                <button
-                  type="button"
-                  className="cursor-pointer rounded-full text-muted-foreground transition-colors hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
-                  aria-label="API Workload Settings"
-                >
-                  <Info className="h-4 w-4" />
-                </button>
-              </PopoverTrigger>
-              <PopoverContent className="w-80 p-3 text-xs">
-                <div className="space-y-2">
-                  <h4 className="font-semibold">Workload Levels</h4>
-                  {workloadOptions.map((opt) => (
-                    <div
-                      key={opt.id}
-                      className="grid grid-cols-[60px_1fr] gap-2"
-                    >
-                      <span className="font-bold">{opt.label}:</span>
-                      <span>{opt.description}</span>
-                    </div>
-                  ))}
-                </div>
-              </PopoverContent>
-            </Popover>
-          </div>
+          <Label className="text-sm font-semibold">API Workload</Label>
           <TabSelector
             options={workloadOptions}
             value={apiWorkload}
