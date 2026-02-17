@@ -1,4 +1,4 @@
-import { memo } from "react";
+import { memo, useCallback } from "react";
 import { Info } from "lucide-react";
 import { buttonVariants } from "@/components/ui/button";
 import {
