@@ -181,12 +181,12 @@ const Index = () => {
   };
 
   // Stable handler pattern to prevent GenerateButton re-renders
-  const handleGenerateRef = useRef(handleGenerate);
-  // Update ref directly in render for efficiency (safe as it's only read in event handler)
+  const handleGenerateRef = useRef<typeof handleGenerate>();
   handleGenerateRef.current = handleGenerate;
 
   const onGenerate = useCallback(() => {
-    handleGenerateRef.current();
+    // The ref is always populated during render, so it's safe to use the non-null assertion.
+    handleGenerateRef.current!();
   }, []);
 
   const missingRequirements = useMemo(() => {
