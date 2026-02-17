@@ -25,7 +25,7 @@ const EMPTY_ARRAY: string[] = [];
 const Index = () => {
   const [apiKey, setApiKey] = useState(() => {
     if (typeof window === "undefined") return "";
-    const shouldSave = localStorage.getItem("save-gemini-key") !== "false";
+    const shouldSave = localStorage.getItem("save-gemini-key") === "true";
     if (!shouldSave) {
       return "";
     }
@@ -35,8 +35,9 @@ const Index = () => {
     if (typeof window === "undefined") {
       return true; // Default to true on the server
     }
-    return localStorage.getItem("save-gemini-key") !== "false";
+    return localStorage.getItem("save-gemini-key") === "true";
   });
+  const debouncedApiKey = useDebounce(apiKey, 500);
   const [savedCVs, setSavedCVs] = useState<SavedCV[]>(() => {
     if (typeof window === "undefined") return [];
     try {
@@ -77,16 +78,16 @@ const Index = () => {
     localStorage.setItem("save-gemini-key", String(saveKey));
   }, [saveKey]);
 
-  // Persist API key in local storage
+  // Persist API key in local storage (debounced)
   useEffect(() => {
-    if (saveKey && apiKey) {
-      localStorage.setItem("gemini-key", apiKey);
+    if (saveKey && debouncedApiKey) {
+      localStorage.setItem("gemini-key", debouncedApiKey);
     } else {
       localStorage.removeItem("gemini-key");
     }
     // always clear session storage to avoid confusion/duplication
     sessionStorage.removeItem("gemini-key");
-  }, [apiKey, saveKey]);
+  }, [debouncedApiKey, saveKey]);
 
   useEffect(() => {
     localStorage.setItem("save-cv-pref", String(saveCV));
