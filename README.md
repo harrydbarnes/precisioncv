@@ -44,7 +44,7 @@ Follow these steps:
 
 ```sh
 # Step 1: Clone the repository.
-git clone https://github.com/harrydbarnes/precisioncv.git
+git clone https://github.com/harrydbarnes/cv-spruce.git
 
 # Step 2: Navigate to the project directory.
 cd precisioncv
