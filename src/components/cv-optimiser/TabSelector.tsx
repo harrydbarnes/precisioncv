@@ -24,9 +24,7 @@ export const TabSelector = memo(({
   return (
     <div
       data-testid="tab-selector"
-      className={cn(
-        "grid w-full grid-cols-3 gap-1 rounded-lg bg-muted p-1 text-muted-foreground"
-      )}
+      className="grid w-full grid-cols-3 gap-1 rounded-lg bg-muted p-1 text-muted-foreground"
     >
       {options.map((opt) => {
         const isSelected = value === opt.id;
