@@ -25,17 +25,17 @@ const EMPTY_ARRAY: string[] = [];
 const Index = () => {
   const [apiKey, setApiKey] = useState(() => {
     if (typeof window === "undefined") return "";
-    const shouldSave = localStorage.getItem("save-gemini-key") === "true";
-    if (!shouldSave) {
-      return "";
+    const shouldSave = localStorage.getItem("save-gemini-key") !== "false";
+    if (shouldSave) {
+      return localStorage.getItem("gemini-key") || sessionStorage.getItem("gemini-key") || "";
     }
-    return localStorage.getItem("gemini-key") || sessionStorage.getItem("gemini-key") || "";
+    return sessionStorage.getItem("gemini-key") || "";
   });
   const [saveKey, setSaveKey] = useState(() => {
     if (typeof window === "undefined") {
       return true; // Default to true on the server
     }
-    return localStorage.getItem("save-gemini-key") === "true";
+    return localStorage.getItem("save-gemini-key") !== "false";
   });
   const debouncedApiKey = useDebounce(apiKey, 500);
   const [savedCVs, setSavedCVs] = useState<SavedCV[]>(() => {

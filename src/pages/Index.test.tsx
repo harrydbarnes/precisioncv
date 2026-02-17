@@ -93,4 +93,20 @@ describe("Index API Key Persistence", () => {
     const input = screen.getByTestId("key-input") as HTMLInputElement;
     expect(input.value).toBe("");
   });
+
+  it("migrates key from sessionStorage if no preference is set (default true)", async () => {
+    // Setup: key in sessionStorage, no save preference (defaults to true)
+    sessionStorage.setItem("gemini-key", "legacy-session-key");
+
+    render(<Index />);
+
+    const input = screen.getByTestId("key-input") as HTMLInputElement;
+    expect(input.value).toBe("legacy-session-key");
+
+    // Should migrate to localStorage
+    await waitFor(() => {
+        expect(localStorage.getItem("gemini-key")).toBe("legacy-session-key");
+        expect(sessionStorage.getItem("gemini-key")).toBeNull();
+    });
+  });
 });
