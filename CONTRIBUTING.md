@@ -10,7 +10,7 @@ CV Spruce is an open-source project, and we love receiving contributions from ou
 2.  **Clone your fork** locally:
     ```bash
 git clone https://github.com/harrydbarnes/cv-spruce.git
-    cd precisioncv
+cd cv-spruce
     ```
 3.  **Install dependencies**:
     ```bash
