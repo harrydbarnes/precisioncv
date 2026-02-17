@@ -111,6 +111,8 @@ export async function extractTextFromUrl(url: string): Promise<string> {
     hostname === "[::]" ||
     hostname.startsWith("127.")
   ) {
+    throw new Error("Access to local network resources is not allowed.");
+  }
 
   const proxyUrl = `${CORS_PROXY_URL}${encodeURIComponent(url)}`;
 
