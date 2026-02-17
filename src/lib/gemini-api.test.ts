@@ -102,7 +102,8 @@ describe("callGeminiApi", () => {
     );
 
     expect(result).toEqual(mockData);
-    // Should verify that qna/updates are NOT required/checked
+    expect(result.interview_qna).toBeUndefined();
+    expect(result.industry_updates).toBeUndefined();
   });
 
   it("should successfully generate content with Minimal workload", async () => {
@@ -123,7 +124,7 @@ describe("callGeminiApi", () => {
     );
 
     expect(result).toEqual(mockData);
-    // Should verify that cover letter is NOT required/checked
+    expect(result.cover_letter).toBeUndefined();
   });
 
   it("should throw error if API key is missing", async () => {
