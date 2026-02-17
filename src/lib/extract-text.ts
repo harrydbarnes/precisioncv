@@ -85,12 +85,32 @@ export async function extractTextFromUrl(url: string): Promise<string> {
     throw new Error("Please enter a valid URL.");
   }
 
-  // Validate the URL format
+  // Validate the URL format and protocol
+  let parsedUrl: URL;
   try {
-    new URL(url);
+    parsedUrl = new URL(url);
   } catch {
     throw new Error("The URL you entered is not valid. Please check and try again.");
   }
+
+  // STRICT SECURITY CHECK: Protocol must be http or https
+  if (parsedUrl.protocol !== "http:" && parsedUrl.protocol !== "https:") {
+    throw new Error(
+      `Invalid URL protocol: "${parsedUrl.protocol}". Only HTTP and HTTPS are allowed.`
+    );
+  }
+
+  // STRICT SECURITY CHECK: Block loopback/local addresses to prevent SSRF via proxy
+  const hostname = parsedUrl.hostname.toLowerCase();
+  if (
+    hostname === "localhost" ||
+    hostname === "127.0.0.1" ||
+    hostname === "0.0.0.0" ||
+    hostname === "169.254.169.254" ||
+    hostname === "[::1]" ||
+    hostname === "[::]" ||
+    hostname.startsWith("127.")
+  ) {
 
   const proxyUrl = `${CORS_PROXY_URL}${encodeURIComponent(url)}`;
 
