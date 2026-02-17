@@ -61,6 +61,7 @@ export const TabSelector = memo(({
                 <PopoverTrigger asChild>
                   <button
                     type="button"
+                    aria-label={`Information about ${opt.label}`}
                     className="relative z-10 mr-1 flex items-center justify-center rounded-full p-0.5 hover:bg-muted/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                     onClick={(e) => e.stopPropagation()}
                   >
