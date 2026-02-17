@@ -69,8 +69,9 @@ const ApiKeyInput = ({ value, onChange, saveKey, onSaveKeyChange }: ApiKeyInputP
         </div>
       </div>
       <p className="mb-2 text-xs text-muted-foreground">
-        Your key is stored in your browser's local storage and never sent to any server other than
-        the Gemini API.
+        {saveKey
+          ? "Your key is stored in your browser's local storage and never sent to any server other than the Gemini API."
+          : "Your key is stored only in this browser session and never sent to any server other than the Gemini API."}
       </p>
       <div className="relative">
         <Input

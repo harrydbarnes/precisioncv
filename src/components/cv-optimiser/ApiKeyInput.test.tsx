@@ -22,13 +22,28 @@ describe("ApiKeyInput", () => {
     expect(helpButton).toBeInTheDocument();
   });
 
-  it("displays the correct storage information", () => {
+  it("displays the correct storage information for session storage", () => {
     render(
       <TooltipProvider>
         <ApiKeyInput
           value=""
           onChange={() => {}}
           saveKey={false}
+          onSaveKeyChange={() => {}}
+        />
+      </TooltipProvider>
+    );
+
+    expect(screen.getByText(/stored only in this browser session/i)).toBeInTheDocument();
+  });
+
+  it("displays the correct storage information for local storage", () => {
+    render(
+      <TooltipProvider>
+        <ApiKeyInput
+          value=""
+          onChange={() => {}}
+          saveKey={true}
           onSaveKeyChange={() => {}}
         />
       </TooltipProvider>
