@@ -23,10 +23,8 @@ export const TabSelector = memo(({
 }) => {
   return (
     <div
-      className={cn(
-        "grid w-full grid-cols-3 gap-1 rounded-lg bg-muted p-1 text-muted-foreground",
-        disabled && "opacity-50 pointer-events-none"
-      )}
+      data-testid="tab-selector"
+      className="grid w-full grid-cols-3 gap-1 rounded-lg bg-muted p-1 text-muted-foreground"
     >
       {options.map((opt) => {
         const isSelected = value === opt.id;
@@ -62,8 +60,9 @@ export const TabSelector = memo(({
                 <PopoverTrigger asChild>
                   <button
                     type="button"
+                    disabled={disabled}
                     aria-label={`Information about ${opt.label}`}
-                    className="relative z-10 mr-1 flex items-center justify-center rounded-full p-0.5 hover:bg-muted/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                    className="relative z-10 mr-1 flex items-center justify-center rounded-full p-0.5 hover:bg-muted/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50"
                     onClick={(e) => e.stopPropagation()}
                   >
                     <Info className="h-3 w-3 opacity-70 sm:h-4 sm:w-4" />
