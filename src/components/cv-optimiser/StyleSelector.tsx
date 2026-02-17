@@ -61,6 +61,7 @@ export const StyleSelector = memo(({
             <button
               type="button"
               onClick={() => toggleStyle(s.id)}
+              aria-pressed={isSelected}
               className="flex h-full items-center justify-center whitespace-nowrap px-3 py-1 text-xs font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-ring sm:px-4 sm:py-2 sm:text-sm"
             >
               {s.label}
