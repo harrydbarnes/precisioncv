@@ -1,16 +1,16 @@
-import { memo } from "react";
+import { memo, useCallback } from "react";
 import { motion } from "framer-motion";
 import { Info } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { buttonVariants } from "@/components/ui/button";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { TailorStyle, CoverLetterStyle, ApiWorkload } from "@/lib/gemini-api";
-import { cn } from "@/lib/utils";
+import { StyleSelector } from "./StyleSelector";
+import { TabSelector } from "./TabSelector";
 
 interface TailorSectionProps {
   keywords: string;
@@ -22,24 +22,6 @@ interface TailorSectionProps {
   apiWorkload: ApiWorkload;
   setApiWorkload: (value: ApiWorkload) => void;
 }
-
-const styles: { id: TailorStyle; label: string; description: string }[] = [
-  {
-    id: "Precision",
-    label: "Precision",
-    description: "Updates precisely to match what is on job spec key words and required experience",
-  },
-  {
-    id: "Ruthless",
-    label: "Ruthless",
-    description: "Helps cut down on crap",
-  },
-  {
-    id: "Ambitious",
-    label: "Ambitious",
-    description: "Helps push the boundaries of your CV",
-  },
-];
 
 const workloadOptions: { id: ApiWorkload; label: string; description: string }[] = [
   {
@@ -65,57 +47,6 @@ const coverLetterOptions: { id: CoverLetterStyle; label: string }[] = [
   { id: "Long", label: "Detailed (Long)" },
 ];
 
-const TabSelector = ({
-  options,
-  value,
-  onChange,
-  disabled,
-  layoutId,
-}: {
-  options: { id: string; label: string }[];
-  value: string;
-  onChange: (value: string) => void;
-  disabled?: boolean;
-  layoutId: string;
-}) => {
-  return (
-    <div
-      className={cn(
-        "grid w-full grid-cols-3 gap-1 rounded-lg bg-muted p-1 text-muted-foreground",
-        disabled && "opacity-50 pointer-events-none"
-      )}
-    >
-      {options.map((opt) => {
-        const isSelected = value === opt.id;
-        return (
-          <button
-            key={opt.id}
-            type="button"
-            onClick={() => onChange(opt.id)}
-            className={cn(
-              "relative z-10 flex flex-col items-center justify-center rounded-md px-2 py-1.5 text-xs font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 sm:text-sm",
-              isSelected
-                ? "text-foreground shadow-sm"
-                : "hover:bg-background/50 hover:text-foreground"
-            )}
-          >
-            {isSelected && (
-              <motion.div
-                layoutId={layoutId}
-                className="absolute inset-0 z-0 rounded-md bg-background shadow-sm"
-                transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
-              />
-            )}
-            <span className="relative z-10 text-center leading-tight">
-              {opt.label}
-            </span>
-          </button>
-        );
-      })}
-    </div>
-  );
-};
-
 const TailorSection = ({
   keywords,
   setKeywords,
@@ -126,13 +57,13 @@ const TailorSection = ({
   apiWorkload,
   setApiWorkload
 }: TailorSectionProps) => {
-  const toggleStyle = (id: TailorStyle) => {
-    if (selectedStyles.includes(id)) {
-      setSelectedStyles(selectedStyles.filter((s) => s !== id));
-    } else {
-      setSelectedStyles([...selectedStyles, id]);
-    }
-  };
+  const handleCoverLetterStyleChange = useCallback((v: string) => {
+    setCoverLetterStyle(v as CoverLetterStyle);
+  }, [setCoverLetterStyle]);
+
+  const handleApiWorkloadChange = useCallback((v: string) => {
+    setApiWorkload(v as ApiWorkload);
+  }, [setApiWorkload]);
 
   return (
     <motion.div
@@ -154,52 +85,10 @@ const TailorSection = ({
       <div className="space-y-3">
         <Label className="text-sm font-semibold">Update Style</Label>
         {/* Mobile-friendly: smaller buttons on mobile to fit one row */}
-        <div className="flex flex-wrap gap-2">
-          {styles.map((s) => {
-            const isSelected = selectedStyles.includes(s.id);
-            return (
-              <div
-                key={s.id}
-                data-testid={`style-option-${s.id}`}
-                className={cn(
-                  buttonVariants({ variant: isSelected ? "default" : "outline" }),
-                  "gap-0 p-0 overflow-hidden transition-all duration-200",
-                  isSelected
-                    ? "bg-hero-500 text-hero-800 hover:bg-hero-600 border-hero-500 ring-2 ring-hero-500 ring-offset-2"
-                    : "hover:bg-hero-100/50 hover:text-hero-800 hover:border-hero-500"
-                )}
-              >
-                <button
-                  type="button"
-                  onClick={() => toggleStyle(s.id)}
-                  className="flex h-full items-center justify-center whitespace-nowrap px-3 py-1 text-xs font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-ring sm:px-4 sm:py-2 sm:text-sm"
-                >
-                  {s.label}
-                </button>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <button
-                      type="button"
-                      className={cn(
-                        "pl-1 pr-3 py-2 h-full flex items-center justify-center transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-ring",
-                        isSelected ? "hover:bg-hero-800/10" : "hover:bg-accent"
-                      )}
-                      aria-label={`${s.label} description`}
-                    >
-                      <Info className="h-4 w-4 opacity-70" />
-                    </button>
-                  </PopoverTrigger>
-                  <PopoverContent
-                    side="top"
-                    className="w-auto max-w-[90vw] p-2 text-xs bg-tooltip-blue border-tooltip-blue text-white shadow-none"
-                  >
-                    <p>{s.description}</p>
-                  </PopoverContent>
-                </Popover>
-              </div>
-            );
-          })}
-        </div>
+        <StyleSelector
+          selectedStyles={selectedStyles}
+          setSelectedStyles={setSelectedStyles}
+        />
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -208,7 +97,7 @@ const TailorSection = ({
           <TabSelector
             options={coverLetterOptions}
             value={coverLetterStyle}
-            onChange={(v) => setCoverLetterStyle(v as CoverLetterStyle)}
+            onChange={handleCoverLetterStyleChange}
             disabled={apiWorkload === "Minimal"}
             layoutId="cover-letter-style"
           />
@@ -251,7 +140,7 @@ const TailorSection = ({
           <TabSelector
             options={workloadOptions}
             value={apiWorkload}
-            onChange={(v) => setApiWorkload(v as ApiWorkload)}
+            onChange={handleApiWorkloadChange}
             layoutId="api-workload"
           />
         </div>
