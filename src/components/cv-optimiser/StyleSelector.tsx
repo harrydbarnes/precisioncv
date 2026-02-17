@@ -34,13 +34,13 @@ export const StyleSelector = memo(({
   selectedStyles: TailorStyle[];
   setSelectedStyles: (value: TailorStyle[]) => void;
 }) => {
-  const toggleStyle = (id: TailorStyle) => {
-    if (selectedStyles.includes(id)) {
-      setSelectedStyles(selectedStyles.filter((s) => s !== id));
-    } else {
-      setSelectedStyles([...selectedStyles, id]);
-    }
-  };
+  const toggleStyle = useCallback((id: TailorStyle) => {
+    setSelectedStyles(prevStyles =>
+      prevStyles.includes(id)
+        ? prevStyles.filter(s => s !== id)
+        : [...prevStyles, id]
+    );
+  }, [setSelectedStyles]);
 
   return (
     <div className="flex flex-wrap gap-2">
