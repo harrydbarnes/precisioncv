@@ -28,9 +28,12 @@ describe("TabSelector", () => {
       />
     );
 
+    // Verify info button is functionally disabled
     const infoButton = screen.getByLabelText("Information about Option 1");
     expect(infoButton).toBeDisabled();
-    expect(infoButton).toHaveClass("disabled:pointer-events-none");
-    expect(infoButton).toHaveClass("disabled:opacity-50");
+
+    // Verify parent container does not apply nested opacity
+    const parent = screen.getByTestId("tab-selector");
+    expect(parent).not.toHaveClass("opacity-50");
   });
 });

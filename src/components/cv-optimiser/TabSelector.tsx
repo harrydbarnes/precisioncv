@@ -23,9 +23,9 @@ export const TabSelector = memo(({
 }) => {
   return (
     <div
+      data-testid="tab-selector"
       className={cn(
-        "grid w-full grid-cols-3 gap-1 rounded-lg bg-muted p-1 text-muted-foreground",
-        disabled && "opacity-50 pointer-events-none"
+        "grid w-full grid-cols-3 gap-1 rounded-lg bg-muted p-1 text-muted-foreground"
       )}
     >
       {options.map((opt) => {
