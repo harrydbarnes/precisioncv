@@ -47,7 +47,7 @@ Follow these steps:
 git clone https://github.com/harrydbarnes/cv-spruce.git
 
 # Step 2: Navigate to the project directory.
-cd precisioncv
+cd cv-spruce
 
 # Step 3: Install the necessary dependencies.
 npm i
