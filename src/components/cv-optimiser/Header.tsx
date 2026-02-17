@@ -33,15 +33,18 @@ const Header = () => {
           <span className="text-hero-900">CV Spruce</span>
         </motion.h1>
 
-        <motion.p
+        <motion.div
           className="mx-auto max-w-2xl text-lg text-muted-foreground md:text-xl"
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
         >
-          Meet Bruce, the CV Spruce agent. Upload your CV and a job specification to receive a tailored CV, cover letter,
-          interview preparation, and industry insights, all generated in seconds.
-        </motion.p>
+          <p>Meet Bruce, the CV Spruce agent.</p>
+          <p className="mt-4 text-base md:text-lg">
+            Upload your CV and a job specification to receive a tailored CV, cover letter,
+            interview preparation, and industry insights, all generated in seconds.
+          </p>
+        </motion.div>
       </div>
     </header>
   );
