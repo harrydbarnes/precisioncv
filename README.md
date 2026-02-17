@@ -1,8 +1,8 @@
-# Precision CV 🚀
+# CV Spruce 🌲
 
 ## Project Info
 
-Welcome to **Precision CV**! 🎯
+Welcome to **CV Spruce** (formerly Precision CV)! 🎯
 
 This isn't just another CV tool; it's your personal career wingman powered by the cutting-edge **Gemini 2.5 Flash API**.
 
@@ -12,7 +12,7 @@ Whether you need to match a job spec with surgical **Precision**, cut the fluff 
 
 ## How can I use this myself?
 
-You have a few options to get started with Precision CV:
+You have a few options to get started with CV Spruce:
 
 ### 1. Use it as is!
 Simply open the application in your browser and start optimizing your CV immediately. Your API key is stored locally in your session, so your data remains private.
@@ -25,19 +25,41 @@ Prefer to run it on your own machine? No problem!
 
 The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
 
+#### Configuration
+
+To run the application, you will need a Google Gemini API Key.
+1. Go to [Google AI Studio](https://aistudio.google.com/).
+2. Create a new API Key.
+3. You can either enter this key in the UI every time you use the app, or configure it in your environment for development.
+
+A `.env.example` file is provided to show the required environment variables.
+```sh
+cp .env.example .env
+# Edit .env and add your VITE_GEMINI_API_KEY
+```
+
+#### Installation
+
 Follow these steps:
 
 ```sh
 # Step 1: Clone the repository.
-git clone <YOUR_GIT_URL>
+git clone https://github.com/harrydbarnes/precisioncv.git
 
 # Step 2: Navigate to the project directory.
-cd precision-cv
+cd precisioncv
 
 # Step 3: Install the necessary dependencies.
 npm i
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+# Step 4: Verify API Key Storage (Optional)
+# This script verifies that the API key storage UI works correctly.
+# Requires python and playwright.
+pip install playwright
+playwright install
+python verify_api_key.py
+
+# Step 5: Start the development server with auto-reloading and an instant preview.
 npm run dev
 ```
 
