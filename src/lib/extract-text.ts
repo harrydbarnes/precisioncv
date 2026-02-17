@@ -102,14 +102,31 @@ export async function extractTextFromUrl(url: string): Promise<string> {
 
   // STRICT SECURITY CHECK: Block loopback/local addresses to prevent SSRF via proxy
   const hostname = parsedUrl.hostname.toLowerCase();
+
+  // Check for private IPv4 ranges:
+  // 10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16, 169.254.0.0/16 (Link-Local)
+  // Ensure it looks like an IP address to avoid false positives on domains (e.g. 10.media.tumblr.com)
+  const isIpV4 = /^[\d.]+$/.test(hostname);
+  const isPrivateIp =
+    isIpV4 &&
+    (/^10\./.test(hostname) ||
+      /^192\.168\./.test(hostname) ||
+      /^172\.(1[6-9]|2[0-9]|3[0-1])\./.test(hostname) ||
+      /^169\.254\./.test(hostname));
+
+  // Check for IPv6 Unique Local Addresses (fc00::/7)
+  // Covers fc00:: and fd00:: (ipv6 addresses in URLs are wrapped in [])
+  const isUniqueLocalIpv6 = /^\[f[cd][0-9a-f]{2}:/i.test(hostname);
+
   if (
     hostname === "localhost" ||
     hostname === "127.0.0.1" ||
     hostname === "0.0.0.0" ||
-    hostname === "169.254.169.254" ||
     hostname === "[::1]" ||
     hostname === "[::]" ||
-    hostname.startsWith("127.")
+    hostname.startsWith("127.") ||
+    isPrivateIp ||
+    isUniqueLocalIpv6
   ) {
     throw new Error("Access to local network resources is not allowed.");
   }
