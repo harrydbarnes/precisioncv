@@ -82,4 +82,15 @@ describe("Index API Key Persistence", () => {
           expect(localStorage.getItem("gemini-key")).toBeNull();
       });
   });
+
+  it("does not load API key from localStorage if save preference is false", () => {
+    // Setup: key saved in localStorage but preference is false
+    localStorage.setItem("save-gemini-key", "false");
+    localStorage.setItem("gemini-key", "should-not-load");
+
+    render(<Index />);
+
+    const input = screen.getByTestId("key-input") as HTMLInputElement;
+    expect(input.value).toBe("");
+  });
 });

@@ -25,6 +25,10 @@ const EMPTY_ARRAY: string[] = [];
 const Index = () => {
   const [apiKey, setApiKey] = useState(() => {
     if (typeof window === "undefined") return "";
+    const shouldSave = localStorage.getItem("save-gemini-key") !== "false";
+    if (!shouldSave) {
+      return "";
+    }
     return localStorage.getItem("gemini-key") || sessionStorage.getItem("gemini-key") || "";
   });
   const [saveKey, setSaveKey] = useState(() => {
@@ -77,12 +81,11 @@ const Index = () => {
   useEffect(() => {
     if (saveKey && apiKey) {
       localStorage.setItem("gemini-key", apiKey);
-      // Clear session storage to avoid confusion/duplication
-      sessionStorage.removeItem("gemini-key");
     } else {
       localStorage.removeItem("gemini-key");
-      sessionStorage.removeItem("gemini-key");
     }
+    // always clear session storage to avoid confusion/duplication
+    sessionStorage.removeItem("gemini-key");
   }, [apiKey, saveKey]);
 
   useEffect(() => {
