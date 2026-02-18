@@ -58,6 +58,13 @@ describe("extractTextFromUrl Security Tests", () => {
     expect(global.fetch).not.toHaveBeenCalled();
   });
 
+  it("rejects subdomains of localhost (foo.localhost)", async () => {
+    await expect(extractTextFromUrl("http://foo.localhost:3000")).rejects.toThrow(
+      /Access to local network resources is not allowed/i
+    );
+    expect(global.fetch).not.toHaveBeenCalled();
+  });
+
   it("rejects loopback address (127.0.0.1)", async () => {
     await expect(extractTextFromUrl("http://127.0.0.1:8080")).rejects.toThrow(
       /Access to local network resources is not allowed/i
@@ -103,7 +110,19 @@ describe("extractTextFromUrl Security Tests", () => {
     expect(global.fetch).not.toHaveBeenCalled();
   });
 
-  it("allows domains starting with private IP prefixes (e.g. 10.media.tumblr.com)", async () => {
+  it("rejects domains with embedded private IPs (DNS Rebinding risk)", async () => {
+    await expect(extractTextFromUrl("http://127.0.0.1.nip.io")).rejects.toThrow(
+      /Access to local network resources is not allowed/i
+    );
+    await expect(extractTextFromUrl("http://10.0.0.1.nip.io")).rejects.toThrow(
+      /Access to local network resources is not allowed/i
+    );
+    await expect(extractTextFromUrl("http://customer-service.192.168.1.50.nip.io")).rejects.toThrow(
+      /Access to local network resources is not allowed/i
+    );
+  });
+
+  it("allows domains starting with private IP prefixes but NOT forming a full IP (e.g. 10.media.tumblr.com)", async () => {
     const mockResponse = {
       ok: true,
       text: async () => "<html><body>Valid Content</body></html>",
@@ -112,6 +131,22 @@ describe("extractTextFromUrl Security Tests", () => {
 
     const text = await extractTextFromUrl("http://10.media.tumblr.com/post");
     expect(text).toBe("Valid Content");
+  });
+
+  it("allows domains with numbers that are not private IPs", async () => {
+    const mockResponse = {
+      ok: true,
+      text: async () => "<html><body>Valid Content</body></html>",
+    };
+    (global.fetch as Mock).mockResolvedValue(mockResponse);
+
+    // 8.8.8.8 is public Google DNS
+    const text = await extractTextFromUrl("http://8.8.8.8/dns");
+    expect(text).toBe("Valid Content");
+
+    // 1.1.1.1 is public Cloudflare DNS
+    const text2 = await extractTextFromUrl("http://1.1.1.1");
+    expect(text2).toBe("Valid Content");
   });
 
   it("rejects invalid URLs", async () => {
