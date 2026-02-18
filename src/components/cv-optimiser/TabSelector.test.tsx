@@ -33,7 +33,7 @@ describe("TabSelector", () => {
     expect(infoButton).toBeDisabled();
 
     // Verify main tab button is also disabled
-    const mainButton = screen.getByRole('button', { name: 'Option 1' });
+    const mainButton = screen.getByRole('tab', { name: 'Option 1' });
     expect(mainButton).toBeDisabled();
 
     // Verify parent container does not apply nested opacity
@@ -41,7 +41,7 @@ describe("TabSelector", () => {
     expect(parent).not.toHaveClass("opacity-50");
   });
 
-  it("sets aria-pressed correctly based on selection", () => {
+  it("sets aria-selected correctly based on selection", () => {
     const options = [
       { id: "opt1", label: "Option 1" },
       { id: "opt2", label: "Option 2" }
@@ -55,10 +55,10 @@ describe("TabSelector", () => {
       />
     );
 
-    const btn1 = screen.getByRole("button", { name: "Option 1" });
-    const btn2 = screen.getByRole("button", { name: "Option 2" });
+    const tab1 = screen.getByRole("tab", { name: "Option 1" });
+    const tab2 = screen.getByRole("tab", { name: "Option 2" });
 
-    expect(btn1).toHaveAttribute("aria-pressed", "true");
-    expect(btn2).toHaveAttribute("aria-pressed", "false");
+    expect(tab1).toHaveAttribute("aria-selected", "true");
+    expect(tab2).toHaveAttribute("aria-selected", "false");
   });
 });

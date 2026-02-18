@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo, memo } from "react";
 import { motion } from "framer-motion";
 import { Copy, Check, Eye, EyeOff } from "lucide-react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
@@ -37,11 +37,15 @@ const OutputCard = ({ title, icon, content, copyText, index, originalText }: Out
     }
   };
 
-  const renderDiff = () => {
-    if (!originalText) return content;
+  // Calculate diff only when text changes (expensive operation O(N*M))
+  const diff = useMemo(() => {
+    if (!originalText) return null;
+    return Diff.diffWords(originalText, copyText);
+  }, [originalText, copyText]);
 
-    // Use word diff for natural text comparison
-    const diff = Diff.diffWords(originalText, copyText);
+  // Render diff elements only when showing diff or when diff changes
+  const diffElements = useMemo(() => {
+    if (!showDiff || !diff) return null;
 
     return (
       <div className="font-mono text-xs whitespace-pre-wrap leading-relaxed">
@@ -61,7 +65,7 @@ const OutputCard = ({ title, icon, content, copyText, index, originalText }: Out
         })}
       </div>
     );
-  };
+  }, [showDiff, diff]);
 
   return (
     <motion.div
@@ -127,11 +131,11 @@ const OutputCard = ({ title, icon, content, copyText, index, originalText }: Out
         </CardHeader>
 
         <CardContent className="text-sm leading-relaxed text-card-foreground/90 whitespace-pre-wrap">
-          {showDiff ? renderDiff() : content}
+          {diffElements || content}
         </CardContent>
       </Card>
     </motion.div>
   );
 };
 
-export default OutputCard;
+export default memo(OutputCard);

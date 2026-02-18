@@ -124,9 +124,9 @@ describe("callGeminiApi", () => {
     );
 
     expect(result).toEqual(mockData);
-    expect(result).not.toHaveProperty("cover_letter");
-    expect(result).not.toHaveProperty("interview_qna");
-    expect(result).not.toHaveProperty("industry_updates");
+    expect(result.cover_letter).toBeUndefined();
+    expect(result.interview_qna).toBeUndefined();
+    expect(result.industry_updates).toBeUndefined();
   });
 
   it("should throw error if API key is missing", async () => {

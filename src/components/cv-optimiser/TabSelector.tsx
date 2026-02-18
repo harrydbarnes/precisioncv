@@ -24,6 +24,7 @@ export const TabSelector = memo(({
   return (
     <div
       data-testid="tab-selector"
+      role="tablist"
       className="grid w-full grid-cols-3 gap-1 rounded-lg bg-muted p-1 text-muted-foreground"
     >
       {options.map((opt) => {
@@ -31,6 +32,7 @@ export const TabSelector = memo(({
         return (
           <div
             key={opt.id}
+            role="presentation"
             className={cn(
               "relative z-10 flex items-center justify-center rounded-md text-xs font-medium transition-all sm:text-sm",
               isSelected
@@ -47,6 +49,7 @@ export const TabSelector = memo(({
             )}
             <button
               type="button"
+              role="tab"
               onClick={() => onChange(opt.id)}
               disabled={disabled}
               aria-selected={isSelected}
