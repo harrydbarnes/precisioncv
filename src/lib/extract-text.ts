@@ -88,7 +88,7 @@ export async function extractTextFromFile(file: File): Promise<string> {
  */
 function isPrivateIpParts(parts: number[]): boolean {
   if (parts.length !== 4) return false;
-  const [a, b, c, d] = parts;
+  const [a, b] = parts;
 
   // 10.0.0.0/8
   if (a === 10) return true;
