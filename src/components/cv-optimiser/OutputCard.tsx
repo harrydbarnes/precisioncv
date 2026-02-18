@@ -131,7 +131,7 @@ const OutputCard = ({ title, icon, content, copyText, index, originalText }: Out
         </CardHeader>
 
         <CardContent className="text-sm leading-relaxed text-card-foreground/90 whitespace-pre-wrap">
-          {showDiff && diffElements ? diffElements : content}
+          {diffElements || content}
         </CardContent>
       </Card>
     </motion.div>
