@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo, memo } from "react";
 import { motion } from "framer-motion";
 import { Copy, Check, Eye, EyeOff } from "lucide-react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
@@ -37,10 +37,12 @@ const OutputCard = ({ title, icon, content, copyText, index, originalText }: Out
     }
   };
 
-  const renderDiff = () => {
-    if (!originalText) return content;
+  const diffElements = useMemo(() => {
+    if (!showDiff || !originalText) return null;
 
     // Use word diff for natural text comparison
+    // This is an expensive operation O(N*M), so memoization is crucial
+    // to prevent recalculation on re-renders (e.g., when 'copied' state changes).
     const diff = Diff.diffWords(originalText, copyText);
 
     return (
@@ -61,7 +63,7 @@ const OutputCard = ({ title, icon, content, copyText, index, originalText }: Out
         })}
       </div>
     );
-  };
+  }, [showDiff, originalText, copyText]);
 
   return (
     <motion.div
@@ -127,11 +129,11 @@ const OutputCard = ({ title, icon, content, copyText, index, originalText }: Out
         </CardHeader>
 
         <CardContent className="text-sm leading-relaxed text-card-foreground/90 whitespace-pre-wrap">
-          {showDiff ? renderDiff() : content}
+          {showDiff && diffElements ? diffElements : content}
         </CardContent>
       </Card>
     </motion.div>
   );
 };
 
-export default OutputCard;
+export default memo(OutputCard);
