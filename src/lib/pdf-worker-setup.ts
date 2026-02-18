@@ -18,5 +18,4 @@ const setupPdfWorker = async () => {
   }
 };
 
-// Execute immediately
-setupPdfWorker();
+export default setupPdfWorker;
