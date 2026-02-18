@@ -1,6 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import TailorSection from "./TailorSection";
 import { vi, describe, it, expect, beforeAll } from "vitest";
+import { TailorStyle } from "@/lib/gemini-api";
 
 describe("TailorSection", () => {
   beforeAll(() => {
@@ -14,7 +15,9 @@ describe("TailorSection", () => {
   it("renders with correct selected styles", () => {
     const setKeywords = vi.fn();
     const setSelectedStyles = vi.fn();
-    const selectedStyles: any = ["Precision"]; // 'Precision' is selected
+    const setCoverLetterStyle = vi.fn();
+    const setApiWorkload = vi.fn();
+    const selectedStyles: TailorStyle[] = ["Precision"]; // 'Precision' is selected
 
     render(
       <TailorSection
@@ -22,6 +25,10 @@ describe("TailorSection", () => {
         setKeywords={setKeywords}
         selectedStyles={selectedStyles}
         setSelectedStyles={setSelectedStyles}
+        coverLetterStyle="Middle"
+        setCoverLetterStyle={setCoverLetterStyle}
+        apiWorkload="Normal"
+        setApiWorkload={setApiWorkload}
       />
     );
 

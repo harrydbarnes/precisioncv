@@ -35,10 +35,22 @@ const workloadOptions: { id: ApiWorkload; label: string; description: string }[]
   },
 ];
 
-const coverLetterOptions: { id: CoverLetterStyle; label: string }[] = [
-  { id: "Short", label: "Quick" },
-  { id: "Middle", label: "Formal" },
-  { id: "Long", label: "Detailed" },
+const coverLetterOptions: { id: CoverLetterStyle; label: string; description: string }[] = [
+  {
+    id: "Short",
+    label: "Quick",
+    description: "Concise and to the point. Best for modern startups and application forms."
+  },
+  {
+    id: "Middle",
+    label: "Formal",
+    description: "Professional and structured. Standard for corporate roles and traditional industries."
+  },
+  {
+    id: "Long",
+    label: "Detailed",
+    description: "Comprehensive narrative. Good for senior positions, academic roles, or explaining complex backgrounds."
+  },
 ];
 
 const TailorSection = ({
