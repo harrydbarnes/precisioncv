@@ -1,5 +1,77 @@
 import { describe, it, expect, vi, beforeEach, afterEach, Mock } from "vitest";
-import { extractTextFromUrl } from "./extract-text";
+import { extractTextFromUrl, extractTextFromFile } from "./extract-text";
+import * as lazyLoad from "./lazy-load";
+
+vi.mock("./lazy-load", () => ({
+  loadPdfJs: vi.fn(),
+  loadMammoth: vi.fn(),
+}));
+
+describe("extractTextFromFile", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  afterEach(() => {
+    // Restore window properties
+    // @ts-ignore
+    delete global.window.pdfjsLib;
+    // @ts-ignore
+    delete global.window.mammoth;
+  });
+
+  it("extracts text from PDF (lazy loads pdf.js)", async () => {
+    const file = new File(["dummy pdf content"], "test.pdf", { type: "application/pdf" });
+    file.arrayBuffer = vi.fn().mockResolvedValue(new ArrayBuffer(10));
+
+    // Mock pdfjsLib
+    const mockPdf = {
+      numPages: 1,
+      getPage: vi.fn().mockResolvedValue({
+        getTextContent: vi.fn().mockResolvedValue({
+          items: [{ str: "PDF Content" }],
+        }),
+      }),
+    };
+
+    (global.window as any).pdfjsLib = {
+      getDocument: vi.fn().mockReturnValue({
+        promise: Promise.resolve(mockPdf),
+      }),
+    };
+
+    const text = await extractTextFromFile(file);
+
+    expect(lazyLoad.loadPdfJs).toHaveBeenCalled();
+    expect(text).toBe("PDF Content");
+  });
+
+  it("extracts text from DOCX (lazy loads mammoth.js)", async () => {
+    const file = new File(["dummy docx content"], "test.docx", { type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document" });
+    file.arrayBuffer = vi.fn().mockResolvedValue(new ArrayBuffer(10));
+
+    // Mock mammoth
+    (global.window as any).mammoth = {
+      extractRawText: vi.fn().mockResolvedValue({ value: "DOCX Content" }),
+    };
+
+    const text = await extractTextFromFile(file);
+
+    expect(lazyLoad.loadMammoth).toHaveBeenCalled();
+    expect(text).toBe("DOCX Content");
+  });
+
+  it("extracts text from TXT (no lazy load)", async () => {
+    const file = new File(["TXT Content"], "test.txt", { type: "text/plain" });
+    file.text = vi.fn().mockResolvedValue("TXT Content");
+
+    const text = await extractTextFromFile(file);
+
+    expect(lazyLoad.loadPdfJs).not.toHaveBeenCalled();
+    expect(lazyLoad.loadMammoth).not.toHaveBeenCalled();
+    expect(text).toBe("TXT Content");
+  });
+});
 
 describe("extractTextFromUrl Security Tests", () => {
   const originalFetch = global.fetch;

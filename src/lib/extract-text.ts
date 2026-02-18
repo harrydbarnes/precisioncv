@@ -3,6 +3,8 @@
  * All processing happens client-side in the browser.
  */
 
+import { loadPdfJs, loadMammoth } from "./lazy-load";
+
 declare global {
   interface Window {
     pdfjsLib: any;
@@ -24,9 +26,10 @@ const CORS_PROXY_URL = "https://api.codetabs.com/v1/proxy?quest=";
 
 /** Extract text from a PDF file using pdf.js */
 async function extractFromPdf(file: File): Promise<string> {
+  await loadPdfJs();
   const pdfjsLib = window.pdfjsLib;
   if (!pdfjsLib) {
-    throw new Error("PDF.js library not loaded. Please refresh the page and try again.");
+    throw new Error("PDF.js library failed to load.");
   }
 
   const arrayBuffer = await file.arrayBuffer();
@@ -47,9 +50,10 @@ async function extractFromPdf(file: File): Promise<string> {
 
 /** Extract text from a DOCX file using mammoth.js */
 async function extractFromDocx(file: File): Promise<string> {
+  await loadMammoth();
   const mammoth = window.mammoth;
   if (!mammoth) {
-    throw new Error("Mammoth.js library not loaded. Please refresh the page and try again.");
+    throw new Error("Mammoth.js library failed to load.");
   }
 
   const arrayBuffer = await file.arrayBuffer();
