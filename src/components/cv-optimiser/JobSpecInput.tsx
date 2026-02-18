@@ -1,7 +1,6 @@
 import { useState, memo, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Briefcase, Globe, Loader2, AlertCircle, X } from "lucide-react";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -9,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import FileUpload from "./FileUpload";
 import { extractTextFromUrl } from "@/lib/extract-text";
+import { TabSelector } from "./TabSelector";
 
 interface JobSpecInputProps {
   value: string;
@@ -31,6 +31,12 @@ const tabContentAnimation = {
   transition: { duration: 0.2 },
 };
 
+const options = [
+  { id: "text", label: "Paste Text" },
+  { id: "file", label: "Upload File" },
+  { id: "url", label: "From URL" },
+];
+
 /** Tabbed job specification input: text, file, or URL */
 const JobSpecInput = ({
   value,
@@ -39,6 +45,7 @@ const JobSpecInput = ({
   rememberJobSpec,
   onRememberChange,
 }: JobSpecInputProps) => {
+  const [activeTab, setActiveTab] = useState("text");
   const [url, setUrl] = useState("");
   const [fetchingUrl, setFetchingUrl] = useState(false);
 
@@ -87,31 +94,21 @@ const JobSpecInput = ({
         )}
       </div>
 
-      <Tabs defaultValue="text" className="w-full">
-        <TabsList className="mb-3 w-full grid grid-cols-3">
-          <TabsTrigger
-            value="text"
-            className="text-xs sm:text-sm hover:bg-hero-100 hover:text-hero-800 transition-colors"
-          >
-            Paste Text
-          </TabsTrigger>
-          <TabsTrigger
-            value="file"
-            className="text-xs sm:text-sm hover:bg-hero-100 hover:text-hero-800 transition-colors"
-          >
-            Upload File
-          </TabsTrigger>
-          <TabsTrigger
-            value="url"
-            className="text-xs sm:text-sm hover:bg-hero-100 hover:text-hero-800 transition-colors"
-          >
-            From URL
-          </TabsTrigger>
-        </TabsList>
+      <div className="space-y-4">
+        <TabSelector
+          options={options}
+          value={activeTab}
+          onChange={setActiveTab}
+          layoutId="job-spec-source"
+        />
 
         <AnimatePresence mode="wait">
-          <TabsContent value="text" key="text">
-            <motion.div {...tabContentAnimation} className="relative">
+          {activeTab === "text" && (
+            <motion.div
+              key="text"
+              {...tabContentAnimation}
+              className="relative"
+            >
               <Textarea
                 placeholder="Paste the job specification here..."
                 value={value}
@@ -129,20 +126,26 @@ const JobSpecInput = ({
                 </button>
               )}
             </motion.div>
-          </TabsContent>
+          )}
 
-          <TabsContent value="file" key="file">
-            <motion.div {...tabContentAnimation}>
+          {activeTab === "file" && (
+            <motion.div
+              key="file"
+              {...tabContentAnimation}
+            >
               <FileUpload
                 label="Job Spec File"
                 onTextExtracted={onChange}
                 onError={onError}
               />
             </motion.div>
-          </TabsContent>
+          )}
 
-          <TabsContent value="url" key="url">
-            <motion.div {...tabContentAnimation}>
+          {activeTab === "url" && (
+            <motion.div
+              key="url"
+              {...tabContentAnimation}
+            >
               <div className="space-y-3">
                 <Input
                   placeholder="https://example.com/job-posting"
@@ -181,9 +184,9 @@ const JobSpecInput = ({
                 </div>
               </div>
             </motion.div>
-          </TabsContent>
+          )}
         </AnimatePresence>
-      </Tabs>
+      </div>
     </motion.div>
   );
 };
