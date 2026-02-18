@@ -37,13 +37,15 @@ const OutputCard = ({ title, icon, content, copyText, index, originalText }: Out
     }
   };
 
-  const diffElements = useMemo(() => {
-    if (!showDiff || !originalText) return null;
+  // Calculate diff only when text changes (expensive operation O(N*M))
+  const diff = useMemo(() => {
+    if (!originalText) return null;
+    return Diff.diffWords(originalText, copyText);
+  }, [originalText, copyText]);
 
-    // Use word diff for natural text comparison
-    // This is an expensive operation O(N*M), so memoization is crucial
-    // to prevent recalculation on re-renders (e.g., when 'copied' state changes).
-    const diff = Diff.diffWords(originalText, copyText);
+  // Render diff elements only when showing diff or when diff changes
+  const diffElements = useMemo(() => {
+    if (!showDiff || !diff) return null;
 
     return (
       <div className="font-mono text-xs whitespace-pre-wrap leading-relaxed">
@@ -63,7 +65,7 @@ const OutputCard = ({ title, icon, content, copyText, index, originalText }: Out
         })}
       </div>
     );
-  }, [showDiff, originalText, copyText]);
+  }, [showDiff, diff]);
 
   return (
     <motion.div
