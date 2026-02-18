@@ -12,3 +12,8 @@
 **Vulnerability:** The `extractTextFromUrl` function blindly proxied user-supplied URLs to a public CORS proxy (`api.codetabs.com`), allowing potential SSRF (scanning localhost/internal services) and XSS (via `javascript:` scheme).
 **Learning:** Even client-side code must validate URLs before sending them to external services, especially proxies, to prevent abuse and protect the user's local network.
 **Prevention:** Strictly validate URL protocols (only `http:` and `https:`) and block loopback/private IP addresses (`localhost`, `127.0.0.1`, `[::1]`) before making fetch requests.
+
+## 2026-02-18 - Inline Script Blocking by Strict CSP
+**Vulnerability:** An inline script in `index.html` used for initializing the PDF.js worker was blocked by the application's strict Content Security Policy (`script-src 'self' ...`), breaking PDF parsing functionality.
+**Learning:** Moving initialization logic from HTML inline scripts to the main application bundle (TypeScript modules) allows for a strict CSP without `'unsafe-inline'` for scripts, significantly reducing the XSS attack surface while maintaining functionality.
+**Prevention:** Avoid inline scripts in `index.html`. Place all initialization logic within the application entry point (e.g., `main.tsx`) or imported modules.
