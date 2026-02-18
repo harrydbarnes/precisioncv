@@ -7,7 +7,7 @@ def run():
         page = context.new_page()
 
         # 1. Navigate to the page
-        page.goto("http://localhost:8080/precisioncv/")
+        page.goto("http://localhost:8080/cv-spruce/")
 
         # 2. Wait for the API Key section to be visible
         # Using a reliable locator for the API key input
