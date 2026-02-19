@@ -4,7 +4,7 @@ import {
   ApiWorkload,
   AiResponse
 } from "./types";
-import { isStringArray, isQnaArray, isIndustryUpdateArray } from "./validation-utils";
+import { validateAiResponse } from "./validation-utils";
 import { generateSystemInstruction, generateUserPrompt } from "./prompt-utils";
 
 const OPENAI_API_URL = "https://api.openai.com/v1/chat/completions";
@@ -69,36 +69,15 @@ export async function callOpenAiApi(
   }
 
   try {
-    const parsed: AiResponse = JSON.parse(textContent);
-
-    // Validation logic
-    if (
-      !parsed ||
-      typeof parsed.match_percentage !== "number" ||
-      !isStringArray(parsed.matching_highlights) ||
-      !isStringArray(parsed.missing_skills) ||
-      typeof parsed.tailored_cv !== "string"
-    ) {
-      throw new Error("The API response is missing required fields (Match, CV).");
-    }
-
-    if (apiWorkload !== "Minimal") {
-      if (typeof parsed.cover_letter !== "string") {
-        throw new Error("The API response is missing the Cover Letter.");
-      }
-    }
-
-    if (apiWorkload === "Normal") {
-      if (!isQnaArray(parsed.interview_qna) || !isIndustryUpdateArray(parsed.industry_updates)) {
-        throw new Error("The API response is missing Q&A or Industry Updates.");
-      }
-    }
-
-    return parsed;
+    const parsed = JSON.parse(textContent);
+    return validateAiResponse(parsed, apiWorkload);
   } catch (e) {
      if (e instanceof SyntaxError) {
        throw new Error("The API response could not be parsed as JSON.");
      }
-     throw e;
+     if (e instanceof Error) {
+        throw e; // Rethrow validation errors
+     }
+     throw new Error("An unknown error occurred while parsing the response.");
   }
 }

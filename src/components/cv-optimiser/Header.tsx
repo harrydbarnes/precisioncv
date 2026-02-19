@@ -7,15 +7,16 @@ interface HeaderProps {
   selectedModel?: ModelType;
 }
 
+const modelInfo = {
+  gemini: { label: "Powered by Gemini 2.5 Flash", icon: Sparkles },
+  claude: { label: "Powered by Claude 3.5 Sonnet", icon: BrainCircuit },
+  openai: { label: "Powered by GPT-4o", icon: Bot },
+};
+
 /** Hero header with app title and description */
 const Header = ({ selectedModel = "gemini" }: HeaderProps) => {
-  const modelInfo = {
-    gemini: { label: "Powered by Gemini 2.5 Flash", icon: Sparkles },
-    claude: { label: "Powered by Claude 3.5 Sonnet", icon: BrainCircuit },
-    openai: { label: "Powered by GPT-4o", icon: Bot },
-  }[selectedModel];
-
-  const Icon = modelInfo.icon;
+  const info = modelInfo[selectedModel];
+  const Icon = info.icon;
 
   return (
     <header className="relative overflow-hidden py-12 md:py-20">
@@ -34,7 +35,7 @@ const Header = ({ selectedModel = "gemini" }: HeaderProps) => {
         >
           <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-4 py-1.5 text-sm font-medium text-primary">
             <Icon className="h-4 w-4" />
-            {modelInfo.label}
+            {info.label}
           </div>
         </motion.div>
 

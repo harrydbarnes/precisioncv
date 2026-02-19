@@ -10,7 +10,7 @@ import {
   IndustryUpdate,
   AiResponse
 } from "./types";
-import { isStringArray, isQnaArray, isIndustryUpdateArray } from "./validation-utils";
+import { validateAiResponse } from "./validation-utils";
 import { generateSystemInstruction, generateUserPrompt } from "./prompt-utils";
 
 // Re-export types for backward compatibility
@@ -146,41 +146,17 @@ export async function callGeminiApi(
       .replace(/```\s*/g, "")
       .trim();
 
-    const parsed: AiResponse = JSON.parse(cleaned);
-
-    // Validate the structure based on workload
-    // Always check base fields
-    if (
-      !parsed ||
-      typeof parsed.match_percentage !== "number" ||
-      !isStringArray(parsed.matching_highlights) ||
-      !isStringArray(parsed.missing_skills) ||
-      typeof parsed.tailored_cv !== "string"
-    ) {
-      throw new Error(
-        "The API response is missing required fields (Match, CV)."
-      );
-    }
-
-    if (apiWorkload !== "Minimal") {
-      if (typeof parsed.cover_letter !== "string") {
-        throw new Error("The API response is missing the Cover Letter.");
-      }
-    }
-
-    if (apiWorkload === "Normal") {
-      if (!isQnaArray(parsed.interview_qna) || !isIndustryUpdateArray(parsed.industry_updates)) {
-        throw new Error("The API response is missing Q&A or Industry Updates.");
-      }
-    }
-
-    return parsed;
+    const parsed = JSON.parse(cleaned);
+    return validateAiResponse(parsed, apiWorkload);
   } catch (parseError) {
     if (parseError instanceof SyntaxError) {
       throw new Error(
         "The API response could not be parsed. This sometimes happens with complex inputs. Please try again."
       );
     }
-    throw parseError;
+    if (parseError instanceof Error) {
+        throw parseError; // Rethrow validation errors
+    }
+    throw new Error("An unknown error occurred while parsing the response.");
   }
 }

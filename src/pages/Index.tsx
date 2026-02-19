@@ -26,6 +26,12 @@ import { usePersistentApiKey } from "@/hooks/use-persistent-api-key";
 
 const EMPTY_ARRAY: string[] = [];
 
+const apiCallers = {
+  gemini: callGeminiApi,
+  openai: callOpenAiApi,
+  claude: callClaudeApi,
+};
+
 const Index = () => {
   const [selectedModel, setSelectedModel] = useState<ModelType>("gemini");
 
@@ -159,12 +165,6 @@ const Index = () => {
 
     try {
       const apiKey = currentApi.apiKey;
-
-      const apiCallers = {
-        gemini: callGeminiApi,
-        openai: callOpenAiApi,
-        claude: callClaudeApi,
-      };
 
       const data = await apiCallers[selectedModel](
         apiKey,

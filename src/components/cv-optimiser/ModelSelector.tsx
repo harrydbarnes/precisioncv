@@ -9,13 +9,13 @@ interface ModelSelectorProps {
   onModelChange: (model: ModelType) => void;
 }
 
-const ModelSelector = ({ selectedModel, onModelChange }: ModelSelectorProps) => {
-  const models: { id: ModelType; label: string; icon: React.ReactNode }[] = [
-    { id: "gemini", label: "Gemini 2.5", icon: <Sparkles className="h-4 w-4" /> },
-    { id: "claude", label: "Claude 3.5", icon: <BrainCircuit className="h-4 w-4" /> },
-    { id: "openai", label: "GPT-4o", icon: <Bot className="h-4 w-4" /> },
-  ];
+const models: { id: ModelType; label: string; icon: React.ReactNode }[] = [
+  { id: "gemini", label: "Gemini 2.5", icon: <Sparkles className="h-4 w-4" /> },
+  { id: "claude", label: "Claude 3.5", icon: <BrainCircuit className="h-4 w-4" /> },
+  { id: "openai", label: "GPT-4o", icon: <Bot className="h-4 w-4" /> },
+];
 
+const ModelSelector = ({ selectedModel, onModelChange }: ModelSelectorProps) => {
   return (
     <div className="flex justify-center mb-6">
       <div className="inline-flex items-center rounded-full border border-border bg-muted/30 p-1 shadow-sm">

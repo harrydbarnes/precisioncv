@@ -1,4 +1,4 @@
-import { IndustryUpdate } from "./types";
+import { IndustryUpdate, AiResponse, ApiWorkload } from "./types";
 
 export const isStringArray = (value: unknown): value is string[] =>
   Array.isArray(value) && value.every((item) => typeof item === "string");
@@ -25,3 +25,31 @@ export const isIndustryUpdateArray = (
       item !== null &&
       typeof (item as Record<string, unknown>).update === "string"
   );
+
+export function validateAiResponse(parsed: any, apiWorkload: ApiWorkload): AiResponse {
+  if (
+    !parsed ||
+    typeof parsed.match_percentage !== "number" ||
+    !isStringArray(parsed.matching_highlights) ||
+    !isStringArray(parsed.missing_skills) ||
+    typeof parsed.tailored_cv !== "string"
+  ) {
+    throw new Error(
+      "The API response is missing required fields (Match, CV)."
+    );
+  }
+
+  if (apiWorkload !== "Minimal") {
+    if (typeof parsed.cover_letter !== "string") {
+      throw new Error("The API response is missing the Cover Letter.");
+    }
+  }
+
+  if (apiWorkload === "Normal") {
+    if (!isQnaArray(parsed.interview_qna) || !isIndustryUpdateArray(parsed.industry_updates)) {
+      throw new Error("The API response is missing Q&A or Industry Updates.");
+    }
+  }
+
+  return parsed as AiResponse;
+}
