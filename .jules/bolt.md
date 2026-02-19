@@ -13,3 +13,7 @@
 ## 2025-05-20 - [Component Extraction for Performance]
 **Learning:** Defining heavy sub-components or complex mapping logic (like `StyleSelector`) inside the parent component's render function or file prevents memoization and makes testing re-renders difficult.
 **Action:** Extract complex sub-components to separate files or exported memoized components. This allows `React.memo` to work effectively and simplifies unit testing with mocks.
+
+## 2025-05-25 - [Async Expensive Computations]
+**Learning:** Heavy synchronous computations (like `diffWords` on large text) inside `useMemo` can block the main thread during the render phase, causing UI freezes on mount even if memoized.
+**Action:** Move expensive computations to `useEffect` and wrap them in `setTimeout(..., 0)` or `requestIdleCallback` to defer execution to the next tick, allowing the browser to paint the initial UI immediately.

@@ -1,4 +1,4 @@
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { describe, it, expect } from "vitest";
 import OutputCard from "./OutputCard";
 
@@ -10,7 +10,7 @@ global.ResizeObserver = class ResizeObserver {
 };
 
 describe("OutputCard", () => {
-  it("renders diff with accessible labels for screen readers", () => {
+  it("renders diff with accessible labels for screen readers", async () => {
     const originalText = "Original content";
     const newText = "Modified content";
 
@@ -37,8 +37,11 @@ describe("OutputCard", () => {
 
     // We expect "Removed: Original" and "Added: Modified" text to be present for screen readers.
     // By checking the parent element's text content, we can verify the full accessible string.
-    const removedPart = screen.getByText("Original");
-    expect(removedPart.parentElement).toHaveTextContent("Removed: Original");
+    // Wait for the async diff calculation to complete
+    await waitFor(() => {
+      const removedPart = screen.getByText("Original");
+      expect(removedPart.parentElement).toHaveTextContent("Removed: Original");
+    });
 
     const addedPart = screen.getByText("Modified");
     expect(addedPart.parentElement).toHaveTextContent("Added: Modified");

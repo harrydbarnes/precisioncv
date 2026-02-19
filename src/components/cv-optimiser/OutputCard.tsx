@@ -1,4 +1,4 @@
-import { useState, useMemo, memo } from "react";
+import { useState, useMemo, memo, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Copy, Check, Eye, EyeOff } from "lucide-react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
@@ -37,10 +37,21 @@ const OutputCard = ({ title, icon, content, copyText, index, originalText }: Out
     }
   };
 
-  // Calculate diff only when text changes (expensive operation O(N*M))
-  const diff = useMemo(() => {
-    if (!originalText) return null;
-    return Diff.diffWords(originalText, copyText);
+  // Calculate diff asynchronously to avoid blocking the main thread on render
+  const [diff, setDiff] = useState<Diff.Change[] | null>(null);
+
+  useEffect(() => {
+    if (!originalText) {
+      setDiff(null);
+      return;
+    }
+
+    // Defer the expensive diff calculation to the next tick
+    const timer = setTimeout(() => {
+      setDiff(Diff.diffWords(originalText, copyText));
+    }, 0);
+
+    return () => clearTimeout(timer);
   }, [originalText, copyText]);
 
   // Render diff elements only when showing diff or when diff changes
