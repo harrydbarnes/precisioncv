@@ -10,6 +10,8 @@ import {
   IndustryUpdate,
   AiResponse
 } from "./types";
+import { isStringArray, isQnaArray, isIndustryUpdateArray } from "./validation-utils";
+import { generateSystemInstruction, generateUserPrompt } from "./prompt-utils";
 
 // Re-export types for backward compatibility
 export type GeminiResponse = AiResponse;
@@ -17,32 +19,6 @@ export type { TailorStyle, CoverLetterStyle, ApiWorkload, IndustryUpdate };
 
 const GEMINI_API_URL =
   "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent";
-
-const isStringArray = (value: unknown): value is string[] =>
-  Array.isArray(value) && value.every((item) => typeof item === "string");
-
-const isQnaArray = (
-  value: unknown
-): value is Array<{ question: string; answer: string }> =>
-  Array.isArray(value) &&
-  value.every(
-    (item: unknown) =>
-      typeof item === "object" &&
-      item !== null &&
-      typeof (item as Record<string, unknown>).question === "string" &&
-      typeof (item as Record<string, unknown>).answer === "string"
-  );
-
-const isIndustryUpdateArray = (
-  value: unknown
-): value is IndustryUpdate[] =>
-  Array.isArray(value) &&
-  value.every(
-    (item: unknown) =>
-      typeof item === "object" &&
-      item !== null &&
-      typeof (item as Record<string, unknown>).update === "string"
-  );
 
 export async function callGeminiApi(
   apiKey: string,
@@ -63,32 +39,9 @@ export async function callGeminiApi(
     throw new Error("No job specification provided. Please add the job spec before generating.");
   }
 
-  const styleInstructions: Record<TailorStyle, string> = {
-    Precision: "Optimise the CV to precisely match the job specification keywords and required experience.",
-    Ruthless: "Cut down on irrelevant details and keep the CV concise and impactful.",
-    Ambitious: "Push the boundaries of the candidate's experience to highlight potential and transferrable skills.",
-  };
+  const systemInstruction = generateSystemInstruction(apiWorkload, coverLetterStyle);
+  const userPrompt = generateUserPrompt(cvText, jobSpecText, keywords, styles);
 
-  const selectedStylesInstructions = styles
-    .map((s) => `${s}: ${styleInstructions[s]}`)
-    .join("\n");
-
-  const coverLetterInstructions: Record<CoverLetterStyle, string> = {
-    Short: "A quick, concise email introduction.",
-    Middle: "A standard formal cover letter.",
-    Long: "An expanded, detailed cover letter highlighting extensive alignment.",
-  };
-
-  const baseSystemInstruction = `You are Bruce, the CV Spruce agent, an expert career advisor and executive recruiter. You will be provided with a candidate's current CV and a target Job Specification. Your task is to analyse both inputs and output a structured JSON object.
-
-Format requirements:
-'match_percentage': An integer from 0 to 100 representing how well the original CV aligns with the job specification.
-'matching_highlights': An array of 2 to 3 brief bullet points highlighting positive aspects of the candidate's existing experience relevant to the job.
-'missing_skills': An array of up to 5 key skills or requirements from the job specification that the candidate lacks.
-'tailored_cv': A string containing the rewritten CV in clean Markdown format. Optimise the candidate's experience and skills to closely align with the job specification.
-Ensure all text uses UK English spelling.`;
-
-  let finalSystemInstruction = baseSystemInstruction;
   let responseSchema: Record<string, any> = {
     type: "OBJECT",
     properties: {
@@ -101,17 +54,11 @@ Ensure all text uses UK English spelling.`;
   };
 
   if (apiWorkload !== "Minimal") {
-    // Reduced or Normal: Add Cover Letter
-    finalSystemInstruction += `\n'cover_letter': A string containing a ${coverLetterInstructions[coverLetterStyle]} in Markdown format.`;
     responseSchema.properties.cover_letter = { type: "STRING" };
     responseSchema.required.push("cover_letter");
   }
 
   if (apiWorkload === "Normal") {
-    // Normal: Add Q&A and Insights
-    finalSystemInstruction += `\n'interview_qna': An array of exactly 5 objects (each with a 'question' and 'answer' string), focusing on technical and behavioural aspects relevant to the job.`;
-    finalSystemInstruction += `\n'industry_updates': An array of exactly 5 objects (each with 'update' string and optional 'source' string) detailing recent trends or news pertaining to the industry. If possible, provide a source link.`;
-
     responseSchema.properties.interview_qna = {
       type: "ARRAY",
       items: {
@@ -137,27 +84,9 @@ Ensure all text uses UK English spelling.`;
     responseSchema.required.push("interview_qna", "industry_updates");
   }
 
-  const userPrompt = `Below is a candidate's CV and a job specification. Please process them according to the system instructions.
-### CANDIDATE CV ###
-${cvText.replace(/###/g, "# # #")}
-### END CANDIDATE CV ###
-
-### JOB SPECIFICATION ###
-${jobSpecText.replace(/###/g, "# # #")}
-### END JOB SPECIFICATION ###
-
-### ADDITIONAL KEYWORDS ###
-${keywords.replace(/###/g, "# # #")}
-### END ADDITIONAL KEYWORDS ###
-
-### STYLE INSTRUCTIONS ###
-The user has selected the following style(s):
-${selectedStylesInstructions}
-### END STYLE INSTRUCTIONS ###`;
-
   const requestBody = {
     system_instruction: {
-      parts: [{ text: finalSystemInstruction }],
+      parts: [{ text: systemInstruction }],
     },
     contents: [
       {

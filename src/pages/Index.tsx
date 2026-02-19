@@ -158,40 +158,23 @@ const Index = () => {
     setLoading(true);
 
     try {
-      let data: AiResponse;
       const apiKey = currentApi.apiKey;
 
-      if (selectedModel === "gemini") {
-        data = await callGeminiApi(
-          apiKey,
-          cvText,
-          jobSpecText,
-          keywords,
-          styles,
-          coverLetterStyle,
-          apiWorkload
-        );
-      } else if (selectedModel === "openai") {
-        data = await callOpenAiApi(
-          apiKey,
-          cvText,
-          jobSpecText,
-          keywords,
-          styles,
-          coverLetterStyle,
-          apiWorkload
-        );
-      } else {
-        data = await callClaudeApi(
-          apiKey,
-          cvText,
-          jobSpecText,
-          keywords,
-          styles,
-          coverLetterStyle,
-          apiWorkload
-        );
-      }
+      const apiCallers = {
+        gemini: callGeminiApi,
+        openai: callOpenAiApi,
+        claude: callClaudeApi,
+      };
+
+      const data = await apiCallers[selectedModel](
+        apiKey,
+        cvText,
+        jobSpecText,
+        keywords,
+        styles,
+        coverLetterStyle,
+        apiWorkload
+      );
 
       setResults(data);
       toast({ title: "Success", description: "Your optimised content is ready." });
