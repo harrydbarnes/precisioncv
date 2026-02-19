@@ -65,7 +65,7 @@ export const StyleSelector = memo(({
               className={cn(
                 "flex h-full items-center justify-center whitespace-nowrap px-3 py-1 text-xs font-medium focus:outline-none sm:px-4 sm:py-2 sm:text-sm",
                 isSelected
-                  ? "focus-visible:ring-0 focus-visible:ring-offset-0"
+                  ? "focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-white/50"
                   : "focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring"
               )}
             >
