@@ -39,6 +39,18 @@ You will receive input data wrapped in XML tags: <candidate_cv>, <job_specificat
   return systemInstruction;
 }
 
+const escapeXml = (unsafe: string) =>
+  unsafe.replace(/[<>&'"]/g, (c) => {
+    switch (c) {
+      case '<': return '&lt;';
+      case '>': return '&gt;';
+      case '&': return '&amp;';
+      case "'": return '&apos;';
+      case '"': return '&quot;';
+      default: return c;
+    }
+  });
+
 export function generateUserPrompt(
   cvText: string,
   jobSpecText: string,
@@ -48,18 +60,6 @@ export function generateUserPrompt(
   const selectedStylesInstructions = styles
     .map((s) => `${s}: ${styleInstructions[s]}`)
     .join("\n");
-
-  const escapeXml = (unsafe: string) =>
-    unsafe.replace(/[<>&'"]/g, (c) => {
-      switch (c) {
-        case '<': return '&lt;';
-        case '>': return '&gt;';
-        case '&': return '&amp;';
-        case "'": return '&apos;';
-        case '"': return '&quot;';
-        default: return c;
-      }
-    });
 
   return `Below is a candidate's CV and a job specification. Please process them according to the system instructions.
 

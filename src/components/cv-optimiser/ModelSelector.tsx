@@ -1,6 +1,6 @@
 import { memo } from "react";
 import { motion } from "framer-motion";
-import { Sparkles, Bot, BrainCircuit } from "lucide-react";
+import { Sparkles, Bot, BrainCircuit, LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ModelType } from "@/lib/types";
 import { MODEL_LABELS } from "@/lib/constants";
@@ -10,10 +10,10 @@ interface ModelSelectorProps {
   onModelChange: (model: ModelType) => void;
 }
 
-const models: { id: ModelType; label: string; icon: React.ReactNode }[] = [
-  { id: "gemini", label: MODEL_LABELS.gemini, icon: <Sparkles className="h-4 w-4" /> },
-  { id: "claude", label: MODEL_LABELS.claude, icon: <BrainCircuit className="h-4 w-4" /> },
-  { id: "openai", label: MODEL_LABELS.openai, icon: <Bot className="h-4 w-4" /> },
+const models: { id: ModelType; label: string; icon: LucideIcon }[] = [
+  { id: "gemini", label: MODEL_LABELS.gemini, icon: Sparkles },
+  { id: "claude", label: MODEL_LABELS.claude, icon: BrainCircuit },
+  { id: "openai", label: MODEL_LABELS.openai, icon: Bot },
 ];
 
 const ModelSelector = ({ selectedModel, onModelChange }: ModelSelectorProps) => {
@@ -22,6 +22,7 @@ const ModelSelector = ({ selectedModel, onModelChange }: ModelSelectorProps) => 
       <div className="inline-flex items-center rounded-full border border-border bg-muted/30 p-1 shadow-sm">
         {models.map((model) => {
           const isSelected = selectedModel === model.id;
+          const Icon = model.icon;
           return (
             <button
               key={model.id}
@@ -42,7 +43,7 @@ const ModelSelector = ({ selectedModel, onModelChange }: ModelSelectorProps) => 
                 />
               )}
               <span className="relative z-10 flex items-center gap-2">
-                {model.icon}
+                <Icon className="h-4 w-4" />
                 {model.label}
               </span>
             </button>
