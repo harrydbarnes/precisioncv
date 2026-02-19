@@ -1,9 +1,24 @@
 import { memo } from "react";
 import { motion } from "framer-motion";
-import { Sparkles } from "lucide-react";
+import { Sparkles, Bot, BrainCircuit } from "lucide-react";
+import { ModelType } from "@/lib/types";
+import { MODEL_FULL_LABELS } from "@/lib/constants";
+
+interface HeaderProps {
+  selectedModel?: ModelType;
+}
+
+const modelInfo = {
+  gemini: { label: MODEL_FULL_LABELS.gemini, icon: Sparkles },
+  claude: { label: MODEL_FULL_LABELS.claude, icon: BrainCircuit },
+  openai: { label: MODEL_FULL_LABELS.openai, icon: Bot },
+};
 
 /** Hero header with app title and description */
-const Header = () => {
+const Header = ({ selectedModel = "gemini" }: HeaderProps) => {
+  const info = modelInfo[selectedModel];
+  const Icon = info.icon;
+
   return (
     <header className="relative overflow-hidden py-12 md:py-20">
       {/* Background glow effect */}
@@ -14,13 +29,14 @@ const Header = () => {
 
       <div className="container mx-auto px-4 text-center">
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
+          key={selectedModel} // Animate on change
+          initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+          transition={{ duration: 0.4 }}
         >
           <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-4 py-1.5 text-sm font-medium text-primary">
-            <Sparkles className="h-4 w-4" />
-            Powered by Gemini 2.5 Flash
+            <Icon className="h-4 w-4" />
+            {info.label}
           </div>
         </motion.div>
 
@@ -41,7 +57,7 @@ const Header = () => {
         >
           <p>Meet Bruce, the CV Spruce agent.</p>
           <p className="mt-4 text-base md:text-lg">
-            Upload your CV and a job specification to receive a tailored CV, cover letter,
+            Choose <strong>Gemini</strong>, <strong>Claude</strong>, or <strong>ChatGPT</strong> to receive a tailored CV, cover letter,
             interview preparation, and industry insights, all generated in seconds.
           </p>
         </motion.div>

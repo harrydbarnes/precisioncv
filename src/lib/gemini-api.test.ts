@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach, Mock } from "vitest";
-import { callGeminiApi, GeminiResponse } from "./gemini-api";
+import { callGeminiApi } from "./gemini-api";
+import { AiResponse } from "./types";
 
 describe("callGeminiApi", () => {
   const originalFetch = global.fetch;
@@ -40,7 +41,7 @@ describe("callGeminiApi", () => {
   };
 
   it("should successfully generate content with Normal workload", async () => {
-    const mockData: GeminiResponse = {
+    const mockData: AiResponse = {
       ...validResponseBase,
       cover_letter: "# Cover Letter",
       interview_qna: [
@@ -84,7 +85,7 @@ describe("callGeminiApi", () => {
   });
 
   it("should successfully generate content with Reduced workload", async () => {
-    const mockData: GeminiResponse = {
+    const mockData: AiResponse = {
       ...validResponseBase,
       cover_letter: "# Cover Letter",
     };
@@ -107,7 +108,7 @@ describe("callGeminiApi", () => {
   });
 
   it("should successfully generate content with Minimal workload", async () => {
-    const mockData: GeminiResponse = {
+    const mockData: AiResponse = {
       ...validResponseBase,
     };
 
