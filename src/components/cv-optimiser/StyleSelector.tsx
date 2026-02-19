@@ -62,7 +62,7 @@ export const StyleSelector = memo(({
               type="button"
               onClick={() => toggleStyle(s.id)}
               aria-pressed={isSelected}
-              className="flex h-full items-center justify-center whitespace-nowrap px-3 py-1 text-xs font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-ring sm:px-4 sm:py-2 sm:text-sm"
+              className="flex h-full items-center justify-center whitespace-nowrap px-3 py-1 text-xs font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring sm:px-4 sm:py-2 sm:text-sm"
             >
               {s.label}
             </button>
@@ -71,7 +71,7 @@ export const StyleSelector = memo(({
                 <button
                   type="button"
                   className={cn(
-                    "pl-1 pr-3 py-2 h-full flex items-center justify-center transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-ring",
+                    "pl-1 pr-3 py-2 h-full flex items-center justify-center transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring",
                     isSelected ? "hover:bg-hero-800/10" : "hover:bg-accent"
                   )}
                   aria-label={`${s.label} description`}
