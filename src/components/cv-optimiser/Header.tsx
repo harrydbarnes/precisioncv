@@ -2,15 +2,16 @@ import { memo } from "react";
 import { motion } from "framer-motion";
 import { Sparkles, Bot, BrainCircuit } from "lucide-react";
 import { ModelType } from "@/lib/types";
+import { MODEL_FULL_LABELS } from "@/lib/constants";
 
 interface HeaderProps {
   selectedModel?: ModelType;
 }
 
 const modelInfo = {
-  gemini: { label: "Powered by Gemini 2.5 Flash", icon: Sparkles },
-  claude: { label: "Powered by Claude 3.5 Sonnet", icon: BrainCircuit },
-  openai: { label: "Powered by GPT-4o", icon: Bot },
+  gemini: { label: MODEL_FULL_LABELS.gemini, icon: Sparkles },
+  claude: { label: MODEL_FULL_LABELS.claude, icon: BrainCircuit },
+  openai: { label: MODEL_FULL_LABELS.openai, icon: Bot },
 };
 
 /** Hero header with app title and description */

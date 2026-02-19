@@ -49,13 +49,14 @@ export function generateUserPrompt(
     .map((s) => `${s}: ${styleInstructions[s]}`)
     .join("\n");
 
-  // Basic XML escaping to prevent breaking out of tags
   const escapeXml = (unsafe: string) =>
-    unsafe.replace(/[<>&]/g, (c) => {
+    unsafe.replace(/[<>&'"]/g, (c) => {
       switch (c) {
         case '<': return '&lt;';
         case '>': return '&gt;';
         case '&': return '&amp;';
+        case "'": return '&apos;';
+        case '"': return '&quot;';
         default: return c;
       }
     });

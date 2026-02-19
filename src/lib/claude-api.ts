@@ -6,6 +6,7 @@ import {
 } from "./types";
 import { validateAiResponse } from "./validation-utils";
 import { generateSystemInstruction, generateUserPrompt } from "./prompt-utils";
+import { ANTHROPIC_VERSION } from "./constants";
 
 const CLAUDE_API_URL = "https://api.anthropic.com/v1/messages";
 
@@ -46,7 +47,7 @@ export async function callClaudeApi(
     method: "POST",
     headers: {
       "x-api-key": apiKey,
-      "anthropic-version": "2023-06-01",
+      "anthropic-version": ANTHROPIC_VERSION,
       "content-type": "application/json",
       "anthropic-dangerously-allow-browser": "true"
     },
@@ -68,7 +69,8 @@ export async function callClaudeApi(
   const textContent = data?.content?.[0]?.text;
 
   if (!textContent) {
-    throw new Error("The API returned an empty response.");
+    console.error("Claude API unexpected response:", data);
+    throw new Error("The API returned an empty response. Check console for details.");
   }
 
   try {

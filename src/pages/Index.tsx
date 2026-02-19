@@ -26,7 +26,17 @@ import { usePersistentApiKey } from "@/hooks/use-persistent-api-key";
 
 const EMPTY_ARRAY: string[] = [];
 
-const apiCallers = {
+type ApiCaller = (
+  apiKey: string,
+  cvText: string,
+  jobSpecText: string,
+  keywords: string,
+  styles: TailorStyle[],
+  coverLetterStyle: CoverLetterStyle,
+  apiWorkload: ApiWorkload
+) => Promise<AiResponse>;
+
+const apiCallers: Record<ModelType, ApiCaller> = {
   gemini: callGeminiApi,
   openai: callOpenAiApi,
   claude: callClaudeApi,
@@ -35,6 +45,9 @@ const apiCallers = {
 const Index = () => {
   const [selectedModel, setSelectedModel] = useState<ModelType>("gemini");
 
+  // While creating a custom hook for multiple keys would be cleaner,
+  // calling usePersistentApiKey three times is simple and robust.
+  // The overhead of 3 string states is negligible.
   const gemini = usePersistentApiKey("gemini");
   const openai = usePersistentApiKey("openai");
   const claude = usePersistentApiKey("claude");

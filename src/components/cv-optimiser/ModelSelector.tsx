@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { Sparkles, Bot, BrainCircuit } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ModelType } from "@/lib/types";
+import { MODEL_LABELS } from "@/lib/constants";
 
 interface ModelSelectorProps {
   selectedModel: ModelType;
@@ -10,9 +11,9 @@ interface ModelSelectorProps {
 }
 
 const models: { id: ModelType; label: string; icon: React.ReactNode }[] = [
-  { id: "gemini", label: "Gemini 2.5", icon: <Sparkles className="h-4 w-4" /> },
-  { id: "claude", label: "Claude 3.5", icon: <BrainCircuit className="h-4 w-4" /> },
-  { id: "openai", label: "GPT-4o", icon: <Bot className="h-4 w-4" /> },
+  { id: "gemini", label: MODEL_LABELS.gemini, icon: <Sparkles className="h-4 w-4" /> },
+  { id: "claude", label: MODEL_LABELS.claude, icon: <BrainCircuit className="h-4 w-4" /> },
+  { id: "openai", label: MODEL_LABELS.openai, icon: <Bot className="h-4 w-4" /> },
 ];
 
 const ModelSelector = ({ selectedModel, onModelChange }: ModelSelectorProps) => {
@@ -25,6 +26,7 @@ const ModelSelector = ({ selectedModel, onModelChange }: ModelSelectorProps) => 
             <button
               key={model.id}
               onClick={() => onModelChange(model.id)}
+              aria-label={`Select ${model.label} model`}
               className={cn(
                 "relative flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-colors outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
                 isSelected

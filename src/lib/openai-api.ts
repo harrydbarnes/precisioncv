@@ -6,6 +6,7 @@ import {
 } from "./types";
 import { validateAiResponse } from "./validation-utils";
 import { generateSystemInstruction, generateUserPrompt } from "./prompt-utils";
+import { DEFAULT_TEMPERATURE } from "./constants";
 
 const OPENAI_API_URL = "https://api.openai.com/v1/chat/completions";
 
@@ -37,7 +38,7 @@ export async function callOpenAiApi(
       { role: "system", content: systemInstruction },
       { role: "user", content: userPrompt }
     ],
-    temperature: 0.7,
+    temperature: DEFAULT_TEMPERATURE,
     response_format: { type: "json_object" }
   };
 
@@ -65,7 +66,8 @@ export async function callOpenAiApi(
   const textContent = data?.choices?.[0]?.message?.content;
 
   if (!textContent) {
-    throw new Error("The API returned an empty response.");
+    console.error("OpenAI API unexpected response:", data);
+    throw new Error("The API returned an empty response. Check console for details.");
   }
 
   try {

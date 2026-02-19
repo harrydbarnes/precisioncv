@@ -11,6 +11,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { ModelType } from "@/lib/types";
+import { MODEL_PROVIDER_NAMES } from "@/lib/constants";
 
 interface ApiKeyInputProps {
   value: string;
@@ -45,6 +46,7 @@ const providerConfig: Record<ModelType, { label: string; link: string; linkText:
 const ApiKeyInput = ({ value, onChange, saveKey, onSaveKeyChange, provider = "gemini" }: ApiKeyInputProps) => {
   const [visible, setVisible] = useState(false);
   const config = providerConfig[provider];
+  const providerName = MODEL_PROVIDER_NAMES[provider];
 
   return (
     <motion.div
@@ -94,8 +96,8 @@ const ApiKeyInput = ({ value, onChange, saveKey, onSaveKeyChange, provider = "ge
       </div>
       <p className="mb-2 text-xs text-muted-foreground">
         {saveKey
-          ? "Your key is stored in your browser's local storage and never sent to any server other than the API."
-          : "Your key is stored only in this browser session and never sent to any server other than the API."}
+          ? `Your key is stored in your browser's local storage and never sent to any server other than the ${providerName} API.`
+          : `Your key is stored only in this browser session and never sent to any server other than the ${providerName} API.`}
       </p>
       <div className="relative">
         <Input
