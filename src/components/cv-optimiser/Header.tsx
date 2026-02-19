@@ -55,7 +55,7 @@ const Header = ({ selectedModel = "gemini" }: HeaderProps) => {
         >
           <p>Meet Bruce, the CV Spruce agent.</p>
           <p className="mt-4 text-base md:text-lg">
-            Upload your CV and a job specification to receive a tailored CV, cover letter,
+            Choose <strong>Gemini</strong>, <strong>Claude</strong>, or <strong>ChatGPT</strong> to receive a tailored CV, cover letter,
             interview preparation, and industry insights, all generated in seconds.
           </p>
         </motion.div>
