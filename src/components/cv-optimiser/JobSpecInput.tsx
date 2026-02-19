@@ -102,90 +102,94 @@ const JobSpecInput = ({
           layoutId="job-spec-source"
         />
 
-        <AnimatePresence mode="wait">
-          {activeTab === "text" && (
-            <motion.div
-              key="text"
-              {...tabContentAnimation}
-              className="relative"
-            >
-              <Textarea
-                placeholder="Paste the job specification here..."
-                value={value}
-                onChange={handleTextChange}
-                className="min-h-[160px] transition-all duration-200 focus:neon-glow pr-8"
-              />
-              {value && (
-                <button
-                  onClick={handleClear}
-                  className="absolute top-2 right-2 p-1 text-muted-foreground hover:text-foreground bg-background/50 rounded-full transition-colors"
-                  aria-label="Clear job specification"
-                  type="button"
-                >
-                  <X className="h-4 w-4" />
-                </button>
-              )}
-            </motion.div>
-          )}
-
-          {activeTab === "file" && (
-            <motion.div
-              key="file"
-              {...tabContentAnimation}
-            >
-              <FileUpload
-                label="Job Spec File"
-                onTextExtracted={onChange}
-                onError={onError}
-              />
-            </motion.div>
-          )}
-
-          {activeTab === "url" && (
-            <motion.div
-              key="url"
-              {...tabContentAnimation}
-            >
-              <div className="space-y-3">
-                <Input
-                  placeholder="https://example.com/job-posting"
-                  value={url}
-                  onChange={(e) => setUrl(e.target.value)}
-                  className="transition-all duration-200 focus:neon-glow"
+        <motion.div layout className="relative overflow-hidden">
+          <AnimatePresence mode="popLayout" initial={false}>
+            {activeTab === "text" && (
+              <motion.div
+                key="text"
+                {...tabContentAnimation}
+                className="relative w-full"
+              >
+                <Textarea
+                  placeholder="Paste the job specification here..."
+                  value={value}
+                  onChange={handleTextChange}
+                  className="min-h-[160px] transition-all duration-200 focus:neon-glow pr-8"
                 />
-                <Button
-                  onClick={handleUrlFetch}
-                  disabled={!url.trim() || fetchingUrl}
-                  variant="outline"
-                  className="w-full"
-                >
-                  {fetchingUrl ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Fetching...
-                    </>
-                  ) : (
-                    <>
-                      <Globe className="mr-2 h-4 w-4" />
-                      Fetch Job Spec from URL
-                    </>
-                  )}
-                </Button>
-                {value && !fetchingUrl && (
-                  <p className="text-xs text-primary">
-                    Job specification text loaded successfully.
-                  </p>
+                {value && (
+                  <button
+                    onClick={handleClear}
+                    className="absolute top-2 right-2 p-1 text-muted-foreground hover:text-foreground bg-background/50 rounded-full transition-colors"
+                    aria-label="Clear job specification"
+                    type="button"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
                 )}
-                <div className="flex items-start gap-2 text-xs text-muted-foreground mt-2">
-                  <AlertCircle className="h-3 w-3 mt-0.5 shrink-0" />
-                  <p>
-                    Note: This feature uses a public proxy (codetabs). Do not use for sensitive internal documents.
-                  </p>
+              </motion.div>
+            )}
+
+            {activeTab === "file" && (
+              <motion.div
+                key="file"
+                {...tabContentAnimation}
+                className="w-full"
+              >
+                <FileUpload
+                  label="Job Spec File"
+                  onTextExtracted={onChange}
+                  onError={onError}
+                />
+              </motion.div>
+            )}
+
+            {activeTab === "url" && (
+              <motion.div
+                key="url"
+                {...tabContentAnimation}
+                className="w-full"
+              >
+                <div className="space-y-3">
+                  <Input
+                    placeholder="https://example.com/job-posting"
+                    value={url}
+                    onChange={(e) => setUrl(e.target.value)}
+                    className="transition-all duration-200 focus:neon-glow"
+                  />
+                  <Button
+                    onClick={handleUrlFetch}
+                    disabled={!url.trim() || fetchingUrl}
+                    variant="outline"
+                    className="w-full"
+                  >
+                    {fetchingUrl ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Fetching...
+                      </>
+                    ) : (
+                      <>
+                        <Globe className="mr-2 h-4 w-4" />
+                        Fetch Job Spec from URL
+                      </>
+                    )}
+                  </Button>
+                  {value && !fetchingUrl && (
+                    <p className="text-xs text-primary">
+                      Job specification text loaded successfully.
+                    </p>
+                  )}
+                  <div className="flex items-start gap-2 text-xs text-muted-foreground mt-2">
+                    <AlertCircle className="h-3 w-3 mt-0.5 shrink-0" />
+                    <p>
+                      Note: This feature uses a public proxy (codetabs). Do not use for sensitive internal documents.
+                    </p>
+                  </div>
                 </div>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </motion.div>
       </div>
     </motion.div>
   );
