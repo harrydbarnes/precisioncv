@@ -55,14 +55,14 @@ export const StyleSelector = memo(({
               "gap-0 p-0 overflow-hidden transition-all duration-200",
               isSelected
                 ? "bg-hero-500 text-hero-800 hover:bg-hero-600 border-hero-500 ring-2 ring-hero-500 ring-offset-2"
-                : "hover:bg-hero-100/50 hover:text-hero-800 hover:border-hero-500"
+                : "hover:bg-background hover:text-foreground hover:border-input [@media(hover:hover)]:hover:bg-hero-100/50 [@media(hover:hover)]:hover:text-hero-800 [@media(hover:hover)]:hover:border-hero-500"
             )}
           >
             <button
               type="button"
               onClick={() => toggleStyle(s.id)}
               aria-pressed={isSelected}
-              className="flex h-full items-center justify-center whitespace-nowrap px-3 py-1 text-xs font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-ring sm:px-4 sm:py-2 sm:text-sm"
+              className="flex h-full items-center justify-center whitespace-nowrap px-3 py-1 text-xs font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring sm:px-4 sm:py-2 sm:text-sm"
             >
               {s.label}
             </button>
@@ -71,8 +71,8 @@ export const StyleSelector = memo(({
                 <button
                   type="button"
                   className={cn(
-                    "pl-1 pr-3 py-2 h-full flex items-center justify-center transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-ring",
-                    isSelected ? "hover:bg-hero-800/10" : "hover:bg-accent"
+                    "pl-1 pr-3 py-2 h-full flex items-center justify-center transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring",
+                    isSelected ? "[@media(hover:hover)]:hover:bg-hero-800/10" : "[@media(hover:hover)]:hover:bg-accent"
                   )}
                   aria-label={`${s.label} description`}
                 >
