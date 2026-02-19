@@ -10,13 +10,16 @@ import ResultsDisplay from "@/components/cv-optimiser/ResultsDisplay";
 import TailorSection from "@/components/cv-optimiser/TailorSection";
 import GenerateButton from "@/components/cv-optimiser/GenerateButton";
 import Footer from "@/components/Footer";
+import ModelSelector from "@/components/cv-optimiser/ModelSelector";
 import {
   callGeminiApi,
-  type GeminiResponse,
   type TailorStyle,
   type CoverLetterStyle,
   type ApiWorkload
 } from "@/lib/gemini-api";
+import { callOpenAiApi } from "@/lib/openai-api";
+import { callClaudeApi } from "@/lib/claude-api";
+import { type AiResponse, type ModelType } from "@/lib/types";
 import { useToast } from "@/hooks/use-toast";
 import { useDebounce } from "@/hooks/use-debounce";
 import { usePersistentApiKey } from "@/hooks/use-persistent-api-key";
@@ -24,7 +27,18 @@ import { usePersistentApiKey } from "@/hooks/use-persistent-api-key";
 const EMPTY_ARRAY: string[] = [];
 
 const Index = () => {
-  const { apiKey, setApiKey, saveKey, setSaveKey } = usePersistentApiKey();
+  const [selectedModel, setSelectedModel] = useState<ModelType>("gemini");
+
+  const gemini = usePersistentApiKey("gemini");
+  const openai = usePersistentApiKey("openai");
+  const claude = usePersistentApiKey("claude");
+
+  const currentApi = {
+    gemini,
+    openai,
+    claude
+  }[selectedModel];
+
   const [savedCVs, setSavedCVs] = useState<SavedCV[]>(() => {
     if (typeof window === "undefined") return [];
     try {
@@ -56,7 +70,7 @@ const Index = () => {
   const [apiWorkload, setApiWorkload] = useState<ApiWorkload>("Normal");
 
   const [loading, setLoading] = useState(false);
-  const [results, setResults] = useState<GeminiResponse | null>(null);
+  const [results, setResults] = useState<AiResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
 
@@ -144,15 +158,41 @@ const Index = () => {
     setLoading(true);
 
     try {
-      const data = await callGeminiApi(
-        apiKey,
-        cvText,
-        jobSpecText,
-        keywords,
-        styles,
-        coverLetterStyle,
-        apiWorkload
-      );
+      let data: AiResponse;
+      const apiKey = currentApi.apiKey;
+
+      if (selectedModel === "gemini") {
+        data = await callGeminiApi(
+          apiKey,
+          cvText,
+          jobSpecText,
+          keywords,
+          styles,
+          coverLetterStyle,
+          apiWorkload
+        );
+      } else if (selectedModel === "openai") {
+        data = await callOpenAiApi(
+          apiKey,
+          cvText,
+          jobSpecText,
+          keywords,
+          styles,
+          coverLetterStyle,
+          apiWorkload
+        );
+      } else {
+        data = await callClaudeApi(
+          apiKey,
+          cvText,
+          jobSpecText,
+          keywords,
+          styles,
+          coverLetterStyle,
+          apiWorkload
+        );
+      }
+
       setResults(data);
       toast({ title: "Success", description: "Your optimised content is ready." });
     } catch (err: any) {
@@ -175,7 +215,7 @@ const Index = () => {
   // Using a string key to ensure stable array reference when contents are identical
   // (prevents re-renders of GenerateButton when typing in inputs that don't change validity).
   const missingReqsKey = [
-    !apiKey.trim() ? "Gemini API Key" : "",
+    !currentApi.apiKey.trim() ? "API Key" : "",
     !cvText.trim() ? "CV Upload" : "",
     !jobSpecText.trim() ? "Job Specification" : "",
   ]
@@ -188,7 +228,7 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <Header />
+      <Header selectedModel={selectedModel} />
 
       <main className="container mx-auto max-w-3xl px-4 pb-20">
         {/* Input section */}
@@ -198,11 +238,14 @@ const Index = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
         >
+          <ModelSelector selectedModel={selectedModel} onModelChange={setSelectedModel} />
+
           <ApiKeyInput
-            value={apiKey}
-            onChange={setApiKey}
-            saveKey={saveKey}
-            onSaveKeyChange={setSaveKey}
+            value={currentApi.apiKey}
+            onChange={currentApi.setApiKey}
+            saveKey={currentApi.saveKey}
+            onSaveKeyChange={currentApi.setSaveKey}
+            provider={selectedModel}
           />
 
           <FileUpload

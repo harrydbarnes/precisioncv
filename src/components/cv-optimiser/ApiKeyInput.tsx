@@ -10,17 +10,41 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { ModelType } from "@/lib/types";
 
 interface ApiKeyInputProps {
   value: string;
   onChange: (value: string) => void;
   saveKey: boolean;
   onSaveKeyChange: (save: boolean) => void;
+  provider?: ModelType;
 }
 
-/** Password-masked input for the Gemini API key */
-const ApiKeyInput = ({ value, onChange, saveKey, onSaveKeyChange }: ApiKeyInputProps) => {
+const providerConfig: Record<ModelType, { label: string; link: string; linkText: string; placeholder: string }> = {
+  gemini: {
+    label: "Gemini API Key",
+    link: "https://aistudio.google.com/app/apikey",
+    linkText: "Google AI Studio",
+    placeholder: "Enter your Gemini API key"
+  },
+  claude: {
+    label: "Claude API Key",
+    link: "https://console.anthropic.com/settings/keys",
+    linkText: "Anthropic Console",
+    placeholder: "Enter your Claude API key"
+  },
+  openai: {
+    label: "OpenAI API Key",
+    link: "https://platform.openai.com/api-keys",
+    linkText: "OpenAI Platform",
+    placeholder: "Enter your OpenAI API key"
+  }
+};
+
+/** Password-masked input for the API key */
+const ApiKeyInput = ({ value, onChange, saveKey, onSaveKeyChange, provider = "gemini" }: ApiKeyInputProps) => {
   const [visible, setVisible] = useState(false);
+  const config = providerConfig[provider];
 
   return (
     <motion.div
@@ -32,7 +56,7 @@ const ApiKeyInput = ({ value, onChange, saveKey, onSaveKeyChange }: ApiKeyInputP
         <div className="flex items-center gap-2">
           <Label htmlFor="api-key" className="flex items-center gap-2 text-sm font-semibold">
             <Key className="h-4 w-4 text-primary" />
-            Gemini API Key
+            {config.label}
           </Label>
           <Popover>
             <PopoverTrigger asChild>
@@ -48,12 +72,12 @@ const ApiKeyInput = ({ value, onChange, saveKey, onSaveKeyChange }: ApiKeyInputP
               <p>
                 Get your API key from{" "}
                 <a
-                  href="https://aistudio.google.com/app/apikey"
+                  href={config.link}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="underline font-semibold"
                 >
-                  Google AI Studio
+                  {config.linkText}
                 </a>
               </p>
             </PopoverContent>
@@ -70,14 +94,14 @@ const ApiKeyInput = ({ value, onChange, saveKey, onSaveKeyChange }: ApiKeyInputP
       </div>
       <p className="mb-2 text-xs text-muted-foreground">
         {saveKey
-          ? "Your key is stored in your browser's local storage and never sent to any server other than the Gemini API."
-          : "Your key is stored only in this browser session and never sent to any server other than the Gemini API."}
+          ? "Your key is stored in your browser's local storage and never sent to any server other than the API."
+          : "Your key is stored only in this browser session and never sent to any server other than the API."}
       </p>
       <div className="relative">
         <Input
           id="api-key"
           type={visible ? "text" : "password"}
-          placeholder="Enter your Gemini API key"
+          placeholder={config.placeholder}
           value={value}
           onChange={(e) => onChange(e.target.value)}
           className="pr-24 transition-all duration-200 focus:neon-glow"

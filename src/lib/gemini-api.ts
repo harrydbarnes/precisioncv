@@ -3,27 +3,20 @@
  * No backend is required; calls go directly to the Gemini API.
  */
 
+import {
+  TailorStyle,
+  CoverLetterStyle,
+  ApiWorkload,
+  IndustryUpdate,
+  AiResponse
+} from "./types";
+
+// Re-export types for backward compatibility
+export type GeminiResponse = AiResponse;
+export type { TailorStyle, CoverLetterStyle, ApiWorkload, IndustryUpdate };
+
 const GEMINI_API_URL =
   "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent";
-
-export type TailorStyle = "Precision" | "Ruthless" | "Ambitious";
-export type CoverLetterStyle = "Short" | "Middle" | "Long";
-export type ApiWorkload = "Normal" | "Reduced" | "Minimal";
-
-export interface IndustryUpdate {
-  update: string;
-  source?: string;
-}
-
-export interface GeminiResponse {
-  match_percentage: number;
-  matching_highlights: string[];
-  missing_skills: string[];
-  tailored_cv: string;
-  cover_letter?: string;
-  interview_qna?: Array<{ question: string; answer: string }>;
-  industry_updates?: IndustryUpdate[];
-}
 
 const isStringArray = (value: unknown): value is string[] =>
   Array.isArray(value) && value.every((item) => typeof item === "string");
@@ -59,7 +52,7 @@ export async function callGeminiApi(
   styles: TailorStyle[] = ["Precision"],
   coverLetterStyle: CoverLetterStyle = "Middle",
   apiWorkload: ApiWorkload = "Normal"
-): Promise<GeminiResponse> {
+): Promise<AiResponse> {
   if (!apiKey.trim()) {
     throw new Error("Please enter your Gemini API key.");
   }
@@ -224,7 +217,7 @@ ${selectedStylesInstructions}
       .replace(/```\s*/g, "")
       .trim();
 
-    const parsed: GeminiResponse = JSON.parse(cleaned);
+    const parsed: AiResponse = JSON.parse(cleaned);
 
     // Validate the structure based on workload
     // Always check base fields

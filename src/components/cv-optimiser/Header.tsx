@@ -1,9 +1,22 @@
 import { memo } from "react";
 import { motion } from "framer-motion";
-import { Sparkles } from "lucide-react";
+import { Sparkles, Bot, BrainCircuit } from "lucide-react";
+import { ModelType } from "@/lib/types";
+
+interface HeaderProps {
+  selectedModel?: ModelType;
+}
 
 /** Hero header with app title and description */
-const Header = () => {
+const Header = ({ selectedModel = "gemini" }: HeaderProps) => {
+  const modelInfo = {
+    gemini: { label: "Powered by Gemini 2.5 Flash", icon: Sparkles },
+    claude: { label: "Powered by Claude 3.5 Sonnet", icon: BrainCircuit },
+    openai: { label: "Powered by GPT-4o", icon: Bot },
+  }[selectedModel];
+
+  const Icon = modelInfo.icon;
+
   return (
     <header className="relative overflow-hidden py-12 md:py-20">
       {/* Background glow effect */}
@@ -14,13 +27,14 @@ const Header = () => {
 
       <div className="container mx-auto px-4 text-center">
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
+          key={selectedModel} // Animate on change
+          initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+          transition={{ duration: 0.4 }}
         >
           <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-4 py-1.5 text-sm font-medium text-primary">
-            <Sparkles className="h-4 w-4" />
-            Powered by Gemini 2.5 Flash
+            <Icon className="h-4 w-4" />
+            {modelInfo.label}
           </div>
         </motion.div>
 
