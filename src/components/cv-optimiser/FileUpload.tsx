@@ -26,6 +26,8 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { extractTextFromFile } from "@/lib/extract-text";
+import { ModelType } from "@/lib/types";
+import { MODEL_PROVIDER_NAMES } from "@/lib/constants";
 
 export interface SavedCV {
   name: string;
@@ -44,6 +46,7 @@ interface FileUploadProps {
   onSelectCV?: (cv: SavedCV) => void;
   onDeleteCV?: (name: string) => void;
   fileName?: string | null;
+  selectedModel: ModelType;
 }
 
 /** Drag-and-drop file upload with text extraction */
@@ -58,6 +61,7 @@ const FileUpload = ({
   onSelectCV,
   onDeleteCV,
   fileName: externalFileName,
+  selectedModel,
 }: FileUploadProps) => {
   const [internalFileName, setInternalFileName] = useState<string | null>(null);
   const fileName = externalFileName !== undefined ? externalFileName : internalFileName;
@@ -134,7 +138,7 @@ const FileUpload = ({
       )}
 
       <p className="mb-2 text-xs text-muted-foreground">
-        Your CV is stored locally in your browser. It is sent to the Gemini API for processing but
+        Your CV is stored locally in your browser. It is sent to the {MODEL_PROVIDER_NAMES[selectedModel]} API for processing but
         is not stored on our servers.
       </p>
 

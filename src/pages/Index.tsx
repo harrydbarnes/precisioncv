@@ -255,6 +255,7 @@ const Index = () => {
             onSelectCV={handleSelectCV}
             onDeleteCV={handleDeleteCV}
             fileName={currentFileName}
+            selectedModel={selectedModel}
           />
 
           <JobSpecInput
