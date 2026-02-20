@@ -12,6 +12,7 @@ describe("FileUpload", () => {
         label="Test Upload"
         onTextExtracted={() => {}}
         onError={() => {}}
+        selectedModel="gemini"
       />
     );
 

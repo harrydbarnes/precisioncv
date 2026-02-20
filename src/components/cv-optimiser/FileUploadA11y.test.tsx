@@ -23,6 +23,7 @@ describe("FileUpload Accessibility", () => {
           onTextExtracted={() => {}}
           onError={() => {}}
           fileName="test-file.pdf"
+          selectedModel="gemini"
         />
       </TooltipProvider>
     );
@@ -48,6 +49,7 @@ describe("FileUpload Accessibility", () => {
           onTextExtracted={() => {}}
           onError={() => {}}
           savedCVs={savedCVs}
+          selectedModel="gemini"
         />
       </TooltipProvider>
     );
